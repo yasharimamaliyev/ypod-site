@@ -92,10 +92,11 @@ export async function initHero3D() {
     for (const r of ringMats) r.m[r.key] = r.base * v;
   };
 
-  let visH = 1, visW = 1, mobile = false;
+  let visH = 1, visW = 1, mobile = false, cw = 1, ch = 1;
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     if (!w || !h) return;
+    cw = w; ch = h;
     mobile = w < 1024;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
@@ -124,9 +125,10 @@ export async function initHero3D() {
     roll.rotation.z = -tri(p, 0, -7, mobile ? 8 : 9) * DEG;  // CSS rotate(9deg) = Three z −9°
     renderer.render(scene, camera);
 
+    // Parıltı mikrofonun ardınca transform ilə gedir: left/top hər kadrda layout yaradırdı (canvas pin-i tam tutur)
     projected.copy(rig.position).project(camera);
-    glow.style.setProperty('--gx', ((projected.x + 1) / 2 * 100).toFixed(2) + '%');
-    glow.style.setProperty('--gy', ((1 - projected.y) / 2 * 100).toFixed(2) + '%');
+    const gx = ((projected.x + 1) / 2 * cw).toFixed(1), gy = ((1 - projected.y) / 2 * ch).toFixed(1);
+    glow.style.transform = `translate3d(${gx}px,${gy}px,0) translate(-50%,-50%)`;
   }
 
   // --- Hazırdır: 3D rejiminə keç ---
@@ -149,11 +151,23 @@ export async function initHero3D() {
   });
   tl.to(state, { p: 1, ease: 'none', duration: 1 }, 0)
     .fromTo(wm, { '--wma': 0.05, '--wms': 1 }, { '--wma': 0.035, '--wms': 1.08, ease: 'none', duration: 1 }, 0)
-    .fromTo(pill, { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.15 }, 0.15)
-    .fromTo(h1, { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.25 }, 0.25)
+    // autoAlpha yox, yalnız opacity: visibility: hidden başlığı və düymələri klaviatura və ekran oxuyucudan gizlədirdi
+    .fromTo(pill, { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.15 }, 0.15)
+    .fromTo(h1, { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.25 }, 0.25)
     .fromTo(mark, { backgroundSize: '0% 100%' }, { backgroundSize: '100% 100%', ease: 'power2.inOut', duration: 0.12 }, 0.42)
-    .fromTo(sub, { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.2 }, 0.4)
-    .fromTo(ctas, { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.2 }, 0.5);
+    .fromTo(sub, { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.2 }, 0.4)
+    .fromTo(ctas, { opacity: 0, y: 32 }, {
+      opacity: 1, y: 0, duration: 0.2,
+      // görünməyən düymə barmaqla basılmasın
+      onUpdate() { ctas.style.pointerEvents = gsap.getProperty(ctas, 'opacity') > 0.5 ? '' : 'none'; },
+    }, 0.5);
+  ctas.style.pointerEvents = 'none';
+
+  // Klaviatura ilə hero mətninə (başlıq, düymələr) fokus gələndə səhifə mətnin göründüyü yerə sürüşür
+  hero.querySelector('.hero-copy').addEventListener('focusin', () => {
+    const st = tl.scrollTrigger, y = st.start + 0.75 * (st.end - st.start);
+    if (window.scrollY < y - 3) window.scrollTo({ top: y, behavior: 'smooth' });
+  });
 
   root.classList.add('is-3d-ready');
   ScrollTrigger.refresh();

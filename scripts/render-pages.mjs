@@ -38,12 +38,30 @@ export function renderPages() {
         ].join('\n  ')
       : '<!-- TODO: SITE_URL təyin olunanda burada hreflang və canonical olacaq -->';
 
+    // Paylaşım kartı: hər dilin öz şəkli (public/og/, scripts/og-render.mjs). og:image mütləq URL olmalıdır,
+    // SITE_URL olmayanda (lokal) nisbi yol yazılır ki, şəkil yenə yoxlana bilsin.
+    const pageUrl = SITE_URL ? `${SITE_URL}/${l.dir}` : '';
+    const ogImage = SITE_URL ? `${SITE_URL}/og/og-${l.code}.jpg` : `${l.root}og/og-${l.code}.jpg`;
+    const social = [
+      pageUrl && `<meta property="og:url" content="${pageUrl}">`,
+      '<meta property="og:site_name" content="Y Pod">',
+      `<meta property="og:image" content="${ogImage}">`,
+      '<meta property="og:image:width" content="1200">',
+      '<meta property="og:image:height" content="630">',
+      `<meta property="og:image:alt" content="${escAttr(t.meta.title)}">`,
+      ...LANGS.filter(o => o.code !== l.code).map(o => `<meta property="og:locale:alternate" content="${dicts[o.code].locale}">`),
+      '<meta name="twitter:card" content="summary_large_image">',
+    ].filter(Boolean).join('\n  ');
+    const ldExtra = SITE_URL ? `"url": "${pageUrl}",\n    "image": "${ogImage}",\n    ` : '';
+
     const vars = {
       ROOT: l.root,
       LANG_AZ: l.root,
       LANG_EN: l.root + 'en/',
       LANG_RU: l.root + 'ru/',
       ALTERNATES: alternates,
+      SOCIAL: social,
+      LD_EXTRA: ldExtra,
       RUNTIME_JSON: JSON.stringify(runtime).replace(/</g, '\\u003c'),
       AZ_CURRENT: l.code === 'az' ? 'aria-current="true"' : '',
       EN_CURRENT: l.code === 'en' ? 'aria-current="true"' : '',

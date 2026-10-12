@@ -10,6 +10,8 @@ export function initNav() {
     // Scroll <html>-də dayandırılır: body-yə overflow verəndə o, ayrıca scroll qutusu olur və sticky nav
     // səhifənin ən başına qayıdırdı (aşağıda menyu açılanda bağlama düyməsi görünmürdü)
     document.documentElement.classList.toggle('menu-open', open);
+    // Menyu açıqkən Tab və ekran oxuyucu arxadakı səhifəyə keçməsin (aria-modal tək bunu etmir)
+    document.querySelectorAll('main, .foot').forEach(el => { el.inert = open; });
     if (open) menu.querySelector('a')?.focus();
   };
 

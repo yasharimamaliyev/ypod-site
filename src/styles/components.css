@@ -175,7 +175,7 @@
 .brand {
   display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
   height: 56px; padding: 0 20px; margin-right: 12px; border-radius: 14px;
-  border: 1px dashed rgba(253, 246, 255, .14);
+  border: 1px solid rgba(253, 246, 255, .10);
   font: 800 20px/1 var(--f-body); letter-spacing: -.02em; color: rgba(253, 246, 255, .55);
   transition: color .3s, border-color .3s;
 }
@@ -196,6 +196,8 @@
   .brand { height: 72px; min-width: 220px; padding: 0 32px; margin-right: 24px; border-radius: 16px; font-size: 28px; }
   .mq-t { animation-duration: 75s; }
 }
+/* Siçan üstündə zolaq dayanır (GSAP versiyası main.js → marquee) */
+@media (hover: hover) { .mq:hover .mq-t { animation-play-state: paused; } }
 @media (prefers-reduced-motion: reduce) { .mq-t { animation: none; } }
 
 /* ---------- Instagram kafeli ---------- */

@@ -304,7 +304,7 @@ export function computeStage(p, Lt, chipInfo, wave = 0) {
   };
 
   /* texts */
-  const vis = (a, b, c, d) => { const i = R(a, b, 'o3'), o = R(c, d); return { o: n(i * (1 - o)), y: n((1 - i) * 36 - o * 36), b: n((1 - i) * 8 + o * 8) }; };
+  const vis = (a, b, c, d) => { const i = R(a, b, 'o3'), o = R(c, d); return { o: n(i * (1 - o)), y: n((1 - i) * 36 - o * 36) }; }; // blur yoxdur: böyük mətn bloklarında hər kadr ağırdır (Safari)
   const intro = vis(0.022, 0.034, 0.046, 0.06);
   const tx = TX.map(w => vis(...w));
 
@@ -329,7 +329,7 @@ export function computeStage(p, Lt, chipInfo, wave = 0) {
 
   /* final */
   const fo = R(0.968, 0.985, 'o3');
-  const fin = { o: n(fo), y: n((1 - fo) * 40), b: n((1 - fo) * 8) };
+  const fin = { o: n(fo), y: n((1 - fo) * 40) };
   s.vig = n(K([[0, 0.6], [0.1, 0.6], [0.145, 1], [0.832, 1], [0.85, 0.35]]));
 
   /* step indicator */

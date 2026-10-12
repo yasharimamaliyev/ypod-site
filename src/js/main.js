@@ -90,11 +90,15 @@ function marquee(gsap, ScrollTrigger) {
   const wrap = gsap.utils.wrap(0, 1);
   const loopW = () => track.scrollWidth / 2; // zolaq iki dəfə təkrarlanır: xPercent -50 = bir dövr
   const fling = { d: 0 };
-  let drag = null;
+  let drag = null, hover = false;
+  // Siçan zolağın üstündədirsə dayanır: adları rahat oxumaq üçün (WCAG 2.2.2)
+  const resume = () => { if (!hover) tween.resume(); };
+  box.addEventListener('pointerenter', e => { if (e.pointerType !== 'mouse') return; hover = true; tween.pause(); });
+  box.addEventListener('pointerleave', e => { if (e.pointerType !== 'mouse') return; hover = false; if (!drag && !gsap.isTweening(fling)) tween.resume(); });
   const seek = dx => tween.progress(wrap(drag.p0 - dx / loopW()));
   box.addEventListener('pointerdown', e => {
     if (e.button) return;
-    if (gsap.isTweening(fling)) { gsap.killTweensOf(fling); tween.resume(); }
+    if (gsap.isTweening(fling)) { gsap.killTweensOf(fling); resume(); }
     drag = { id: e.pointerId, x: e.clientX, y: e.clientY, p0: tween.progress(), on: false, vx: 0, lx: e.clientX, lt: e.timeStamp };
   });
   box.addEventListener('pointermove', e => {
@@ -124,7 +128,7 @@ function marquee(gsap, ScrollTrigger) {
     gsap.to(fling, {
       d: v * 320, duration: 0.9, ease: 'power3.out',
       onUpdate: () => tween.progress(wrap(d.p0 - (base + fling.d) / loopW())),
-      onComplete: () => tween.resume(),
+      onComplete: resume,
     });
   };
   box.addEventListener('pointerup', release);

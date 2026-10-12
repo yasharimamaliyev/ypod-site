@@ -118,10 +118,9 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
     else if (prop === 'class') node.className = v;
     else node.style[prop] = v;
   };
-  const fade = (node, o, y = 0, b = 0) => {
+  const fade = (node, o, y = 0) => {
     set(node, 'opacity', String(o));
     set(node, 'transform', y ? `translate3d(0,${y}px,0)` : 'none');
-    set(node, 'filter', b > 0.05 ? `blur(${b}px)` : 'none');
   };
   const at = (node, x, y, extra = '') => set(node, 'transform', `translate3d(${x}px,${y}px,0) translate(-50%,-50%)${extra}`);
 
@@ -186,8 +185,8 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
       hero?.setCovered(st.hero.dark >= 1);
     }
 
-    fade(el.intro, st.intro.o, st.intro.y, st.intro.b);
-    st.tx.forEach((t, i) => fade(el.txt[i], t.o, t.y, t.b));
+    fade(el.intro, st.intro.o, st.intro.y);
+    st.tx.forEach((t, i) => fade(el.txt[i], t.o, t.y));
     st.chips.forEach((ch, i) => {
       const c = el.chips[i];
       set(c.c, 'opacity', String(ch.o));
@@ -215,7 +214,7 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
     set(el.ready, 'opacity', String(ed.readyO));
     if (ed.readyO > 0) at(el.ready, ed.exX, ed.exY, ` scale(${ed.readyS})`);
 
-    fade(el.fin, st.fin.o, st.fin.y, st.fin.b);
+    fade(el.fin, st.fin.o, st.fin.y);
     const finOn = st.fin.o > 0.5;
     set(el.fin, 'pointerEvents', finOn ? 'auto' : 'none');
     if (finOn !== el.fin._on) {
