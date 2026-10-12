@@ -1,10 +1,23 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TIERS, studioPrice, fullPrice, corpOld, corpNow, corpPerHour, fmt } from '../src/js/pricing.js';
+import { TIERS, studioPrice, fullPrice, reelsPrice, EDIT, corpOld, corpNow, corpPerHour, fmt } from '../src/js/pricing.js';
 
 test('kart qiymətləri (6): studiya və tam xidmət', () => {
   assert.deepEqual([0, 1, 2].map(studioPrice), [70, 120, 170]);
-  assert.deepEqual([0, 1, 2].map(fullPrice), [170, 220, 270]);
+  assert.deepEqual([0, 1, 2].map(c => fullPrice(c)), [170, 220, 270]);
+  assert.deepEqual([0, 1, 2].map(c => studioPrice(c, 'studio')), [70, 120, 170]);
+});
+
+test('Sizin məkanda (səyyar studiya): çəkiliş və tam xidmət', () => {
+  assert.deepEqual([0, 1, 2].map(c => studioPrice(c, 'onsite')), [140, 240, 340]);
+  assert.deepEqual([0, 1, 2].map(c => fullPrice(c, 'onsite')), [240, 340, 440]);
+});
+
+test('Reels Paketi və montaj yerə görə', () => {
+  assert.equal(reelsPrice('studio'), 150);
+  assert.equal(reelsPrice('onsite'), 250);
+  assert.equal(reelsPrice(), 150);
+  assert.equal(EDIT, 100); // montaj hər iki yerdə eynidir
 });
 
 test('korporativ qiymətlər (12) cədvəllə üst-üstə düşür', () => {

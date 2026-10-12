@@ -47,6 +47,12 @@
         // main.js ümumiyyətlə yüklənməsə, statik hero-ya qayıt ki, mətn gizli qalmasın
         setTimeout(function () { if (!window.__ypod) d.classList.remove('can-3d'); }, 5000);
       }
+      // Xidmətlər: scroll filmi (svc-anim) və ya alt-alta kartlar (svc-static). Hündürlük ilk boyamadan bilinir.
+      var coarse = matchMedia('(pointer: coarse)').matches;
+      var lowEnd = (navigator.hardwareConcurrency || 8) <= 4 && (navigator.deviceMemory || 8) <= 4 && coarse;
+      var saveData = !!(navigator.connection && navigator.connection.saveData);
+      d.classList.add(rm || lowEnd || saveData ? 'svc-static' : 'svc-anim');
+      setTimeout(function () { if (!window.__ypod) d.classList.replace('svc-anim', 'svc-static'); }, 5000);
     })();
   </script>
 
@@ -147,73 +153,106 @@
           <img class="hero-mic" src="{{ROOT}}assets/mic-hero.webp" alt="" width="858" height="2000" decoding="async" fetchpriority="high">
         </div>
       </div>
+      <div class="hero-tail" aria-hidden="true"></div>
     </div>
   </section>
 
-  <!-- ============ XİDMƏTLƏR ============ -->
-  <section class="sec" id="xidmetler">
-    <div class="wrap">
-      <header class="sec-head rv">
-        <p class="eb">{{services.eyebrow}}</p>
-        <h2 class="hd h2">{{services.title}}</h2>
-      </header>
-
-      <div class="bento">
-        <article class="panel panel-lg rv">
-          <p class="eb">{{services.podcast_eyebrow}}</p>
-          <h3 class="hd h3">{{services.podcast_a}}<span class="h3-dim">{{services.podcast_b}}</span></h3>
-          <p class="mut panel-text">{{services.podcast_text}}</p>
-          <ul class="tags">
-            <li class="pill">{{services.tag_1}}</li>
-            <li class="pill">{{services.tag_2}}</li>
-            <li class="pill">{{services.tag_3}}</li>
-            <li class="pill">{{services.tag_4}}</li>
-          </ul>
-          <div class="media-ph">
-            <span class="play" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fdf6ff"><path d="M8 5.5v13l11-6.5z"/></svg></span>
-            <span>{{services.podcast_media}}</span>
-          </div>
-        </article>
-
-        <article class="panel panel-lg rv" style="--d:.1s">
-          <p class="eb">{{services.reels_eyebrow}}</p>
-          <h3 class="hd h3">{{services.reels_a}}<span class="h3-dim">{{services.reels_b}}</span></h3>
-          <div class="phone-wrap">
-            <div class="phone">
-              <div class="phone-screen">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 8.5h18M8 3l3 5.5M14 3l3 5.5"/><path d="M10 12v5l4.5-2.5z"/></svg>
-                <span>{{services.reels_media}}</span>
-              </div>
+  <!-- ============ XİDMƏTLƏR (scroll filmi, BRIEF: ypod-services-handoff v2) ============ -->
+  <section class="svc" id="xidmetler" aria-labelledby="svc-title">
+    <div class="svc-pin">
+      <div class="svc-bg" aria-hidden="true"></div>
+      <div class="svc-art" aria-hidden="true"></div>
+      <div class="svc-vig" aria-hidden="true"></div>
+      <div class="svc-shade svc-shade--copy" aria-hidden="true"></div>
+      <div class="svc-shade svc-shade--steps" aria-hidden="true"></div>
+      <div class="svc-copy">
+        <div class="svc-intro">
+          <p class="eb">{{services.eyebrow}}</p>
+          <h2 class="hd svc-h2" id="svc-title">{{services.title}}</h2>
+        </div>
+          <article class="svc-scene" data-scene="1">
+            <div class="svc-fig" aria-hidden="true"></div>
+            <div class="svc-txt">
+              <p class="eb">{{services.s1_eb}}</p>
+              <h3 class="hd svc-h3">{{services.s1_h}}</h3>
+              <p class="svc-sub">{{services.s1_sub}}</p>
             </div>
-          </div>
-        </article>
-
-        <article class="panel panel-sm rv">
-          <span class="ico" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h1M7 8v8M11 5v14M15 8v8M19 10v4"/></svg></span>
-          <div class="panel-sm-body">
-            <p class="eb">{{services.edit_eyebrow}}</p>
-            <h3 class="hd h3-sm">{{services.edit_title}}</h3>
-          </div>
-        </article>
-
-        <article class="panel panel-sm rv" style="--d:.1s">
-          <span class="ico" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg></span>
-          <div class="panel-sm-body">
-            <p class="eb">{{services.mobile_eyebrow}}</p>
-            <h3 class="hd h3-sm">{{services.mobile_title}}</h3>
-            <p class="mut panel-text">{{services.mobile_text}}</p>
-          </div>
-        </article>
+            <p class="svc-chip"><span class="svc-chip-t"><span class="svc-chip-l">{{services.s1_chip}}</span> <span class="svc-num">{{services.s1_num}}</span> <span>{{prices.cur}}</span></span></p>
+          </article>
+          <article class="svc-scene" data-scene="2">
+            <div class="svc-fig" aria-hidden="true"></div>
+            <div class="svc-txt">
+              <p class="eb">{{services.s2_eb}}</p>
+              <h3 class="hd svc-h3">{{services.s2_h}}</h3>
+              <p class="svc-sub">{{services.s2_sub}}</p>
+            </div>
+            <p class="svc-chip"><span class="svc-chip-t"><span class="svc-chip-l">{{services.s2_chip}}</span> <span class="svc-num">{{services.s2_num}}</span> <span>{{prices.cur}}</span></span></p>
+          </article>
+          <article class="svc-scene" data-scene="3">
+            <div class="svc-fig" aria-hidden="true"></div>
+            <div class="svc-txt">
+              <p class="eb">{{services.s3_eb}}</p>
+              <h3 class="hd svc-h3">{{services.s3_h}}</h3>
+              <p class="svc-sub">{{services.s3_sub}}</p>
+            </div>
+            <p class="svc-chip"><span class="svc-chip-t"><span class="svc-chip-l">{{services.s3_chip}}</span> <span class="svc-num">{{services.s3_num}}</span> <span>{{prices.cur}}</span></span></p>
+          </article>
+          <article class="svc-scene" data-scene="4">
+            <div class="svc-fig" aria-hidden="true"></div>
+            <div class="svc-txt">
+              <p class="eb">{{services.s4_eb}}</p>
+              <h3 class="hd svc-h3">{{services.s4_h}}</h3>
+              <p class="svc-sub">{{services.s4_sub}}</p>
+            </div>
+            <p class="svc-chip"><span class="svc-chip-t"><span class="svc-chip-l">{{services.s4_chip}}</span> <span class="svc-num">{{services.s4_num}}</span> <span>{{prices.cur}}</span></span></p>
+          </article>
+          <article class="svc-scene" data-scene="5">
+            <div class="svc-fig" aria-hidden="true"></div>
+            <div class="svc-txt">
+              <p class="eb">{{services.s5_eb}}</p>
+              <h3 class="hd svc-h3">{{services.s5_h}}</h3>
+              <p class="svc-sub">{{services.s5_sub}}</p>
+            </div>
+            <p class="svc-chip"><span class="svc-chip-t"><span class="svc-chip-l">{{services.s5_chip}}</span> <span class="svc-num">{{services.s5_num}}</span> <span>{{prices.cur}}</span></span></p>
+            <p class="svc-note">{{services.s5_note}}</p>
+          </article>
+          <article class="svc-scene" data-scene="6">
+            <div class="svc-fig" aria-hidden="true"></div>
+            <div class="svc-txt">
+              <p class="eb">{{services.s6_eb}}</p>
+              <h3 class="hd svc-h3">{{services.s6_h}}</h3>
+              <p class="svc-sub">{{services.s6_sub}}</p>
+            </div>
+            <p class="svc-chip"><span class="svc-chip-t"><span class="svc-chip-l">{{services.s6_chip}}</span> <span class="svc-num">{{services.s6_num}}</span> <span>{{prices.cur}}</span></span></p>
+          </article>
       </div>
-    </div>
-  </section>
-
-  <!-- ============ ƏSAS MESAJ ============ -->
-  <section class="msg" aria-label="{{=message.aria}}">
-    <div class="msg-glow" aria-hidden="true"></div>
-    <div class="wrap msg-in">
-      <h2 class="hd msg-h"><span class="msg-w rv">{{message.a}}</span><span class="msg-w msg-grad rv" style="--d:.12s">{{message.b}}</span></h2>
-      <p class="mut msg-text rv" style="--d:.24s">{{message.text}}</p>
+      <div class="svc-reels" aria-hidden="true">1/5</div>
+      <div class="svc-edit-ui" aria-hidden="true">
+        <div class="svc-esteps">
+          <span class="svc-estep"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{services.edit_1}}</span>
+          <span class="svc-estep"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{services.edit_2}}</span>
+          <span class="svc-estep"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{services.edit_3}}</span>
+        </div>
+        <span class="svc-export" data-tpl="{{=services.export}}"></span>
+        <span class="svc-ready"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{services.ready}}</span>
+      </div>
+      <div class="svc-final">
+        <h2 class="hd svc-final-h">{{message.a}}<span class="svc-grad">{{message.b}}</span></h2>
+        <p class="svc-final-t">{{message.text}}</p>
+        <div class="svc-final-ctas">
+          <a class="btn btn-p" data-wa="general" href="#elaqe">{{hero.cta}}</a>
+          <a class="btn btn-s" href="#qiymetler">{{hero.prices}}</a>
+        </div>
+      </div>
+      <nav class="svc-steps" aria-label="{{=services.steps_aria}}">
+        <span class="svc-steps-line" aria-hidden="true"><span></span></span>
+        <button class="svc-step" type="button" data-step="0"><span class="svc-step-bar" aria-hidden="true"><span></span></span><span class="svc-step-t">{{services.step_1}}</span><span class="svc-step-dot" aria-hidden="true"></span></button>
+        <button class="svc-step" type="button" data-step="1"><span class="svc-step-bar" aria-hidden="true"><span></span></span><span class="svc-step-t">{{services.step_2}}</span><span class="svc-step-dot" aria-hidden="true"></span></button>
+        <button class="svc-step" type="button" data-step="2"><span class="svc-step-bar" aria-hidden="true"><span></span></span><span class="svc-step-t">{{services.step_3}}</span><span class="svc-step-dot" aria-hidden="true"></span></button>
+        <button class="svc-step" type="button" data-step="3"><span class="svc-step-bar" aria-hidden="true"><span></span></span><span class="svc-step-t">{{services.step_4}}</span><span class="svc-step-dot" aria-hidden="true"></span></button>
+        <button class="svc-step" type="button" data-step="4"><span class="svc-step-bar" aria-hidden="true"><span></span></span><span class="svc-step-t">{{services.step_5}}</span><span class="svc-step-dot" aria-hidden="true"></span></button>
+        <button class="svc-step" type="button" data-step="5"><span class="svc-step-bar" aria-hidden="true"><span></span></span><span class="svc-step-t">{{services.step_6}}</span><span class="svc-step-dot" aria-hidden="true"></span></button>
+      </nav>
     </div>
   </section>
 
@@ -248,6 +287,15 @@
       </header>
 
       <div class="seg-row rv">
+        <span class="seg-label" id="place-a">{{place.label}}</span>
+        <div class="seg seg-place" role="group" aria-labelledby="place-a">
+          <span class="seg-thumb" aria-hidden="true"></span>
+          <button class="sg on" type="button" data-place="studio" aria-pressed="true">{{place.studio}}</button>
+          <button class="sg" type="button" data-place="onsite" aria-pressed="false">{{place.onsite}}</button>
+        </div>
+      </div>
+
+      <div class="seg-row rv">
         <span class="seg-label" id="cams-a">{{cams.label}}</span>
         <div class="seg seg-cams" role="group" aria-labelledby="cams-a">
           <span class="seg-thumb" aria-hidden="true"></span>
@@ -259,7 +307,7 @@
 
       <div class="price-grid">
         <article class="card price-card rv">
-          <h3 class="hd h-card">{{prices.studio_title}}</h3>
+          <h3 class="hd h-card" data-place-title data-studio="{{=prices.studio_title}}" data-onsite="{{=prices.onsite_title}}">{{prices.studio_title}}</h3>
           <ul class="ck">
             <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-cam-label>{{cams.c0}}</span></li>
             <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.studio_i2}}</li>
@@ -316,7 +364,7 @@
         </div>
         <div class="reels-pack-buy">
           <div class="price">
-            <div class="price-row"><span class="hd price-num price-num-lg">150</span><span class="price-cur">{{prices.cur}}</span></div>
+            <div class="price-row"><span class="hd price-num price-num-lg" data-price="reels">150</span><span class="price-cur">{{prices.cur}}</span></div>
             <span class="mut price-unit">{{prices.reels_unit}}</span>
           </div>
           <a class="btn btn-p" data-wa="reels" href="#elaqe">{{prices.reels_cta}}</a>

@@ -18,7 +18,7 @@ export const LANGS = [
 ];
 
 // JS-in işləmə vaxtında lazım olan açarlar (WhatsApp mətnləri, kamera adları)
-const RUNTIME_KEYS = ['lang', 'cams', 'wa', 'ig'];
+const RUNTIME_KEYS = ['lang', 'cams', 'wa', 'wa_place', 'ig'];
 
 const get = (obj, path) => path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
 const escAttr = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');

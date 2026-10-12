@@ -1,6 +1,9 @@
 // Qiymət məntiqi. Rəqəmlər CLAUDE.md bölmə 3-dən götürülüb, dəyişiklik yalnız sahibkarın təsdiqi ilə.
-export const HOURLY = [70, 120, 170]; // 1/2/3 kamera, 1 saat studiya çəkilişi
-export const EDIT = 100;              // 1 saatlıq epizodun montajı
+export const HOURLY = [70, 120, 170];         // 1/2/3 kamera, 1 saat studiya çəkilişi
+export const ONSITE_HOURLY = [140, 240, 340]; // səyyar studiya ("Sizin məkanda"), yol haqqı daxil
+export const EDIT = 100;                      // 1 saatlıq epizodun montajı (hər iki yerdə eyni)
+export const REELS = { studio: 150, onsite: 250 };
+export const PLACES = ['studio', 'onsite'];
 
 export const TIERS = [
   { h: 5, d: 10, m: 2, p: [315, 540, 765] },
@@ -9,8 +12,9 @@ export const TIERS = [
   { h: 20, d: 40, m: 12, p: [840, 1440, 2040], best: true },
 ];
 
-export const studioPrice = cam => HOURLY[cam];
-export const fullPrice = cam => HOURLY[cam] + EDIT;
+export const studioPrice = (cam, place = 'studio') => (place === 'onsite' ? ONSITE_HOURLY : HOURLY)[cam];
+export const fullPrice = (cam, place = 'studio') => studioPrice(cam, place) + EDIT;
+export const reelsPrice = (place = 'studio') => REELS[place];
 export const corpOld = (tier, cam) => HOURLY[cam] * tier.h;
 export const corpNow = (tier, cam) => tier.p[cam];
 export const corpPerHour = (tier, cam) => Math.round(tier.p[cam] / tier.h);
@@ -34,24 +38,39 @@ function placeThumb(seg) {
   thumb.style.transform = `translateX(${on.offsetLeft}px)`;
 }
 
-// Hər [data-pricing] bölməsinin öz kamera seçimi var
-export function initPricing({ camLabels, onCamChange }) {
+function press(buttons, isOn) {
+  buttons.forEach(b => {
+    const on = isOn(b);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+}
+
+// Hər [data-pricing] bölməsinin öz kamera seçimi var. Qiymətlər bölməsində həm də yer seçimi var
+// ("Studiyada | Sizin məkanda"); korporativ paketlər yalnız studiya üçündür.
+export function initPricing({ camLabels, onChange }) {
   for (const section of document.querySelectorAll('[data-pricing]')) {
     const kind = section.dataset.pricing;
     const seg = section.querySelector('.seg-cams');
     const buttons = [...seg.querySelectorAll('.sg')];
+    const placeSeg = section.querySelector('.seg-place');
+    const placeButtons = placeSeg ? [...placeSeg.querySelectorAll('.sg')] : [];
+    const placeTitles = [...section.querySelectorAll('[data-place-title]')];
+    let cam = 0, place = 'studio';
 
-    const render = cam => {
-      buttons.forEach(b => {
-        const on = +b.dataset.cam === cam;
-        b.classList.toggle('on', on);
-        b.setAttribute('aria-pressed', String(on));
-      });
+    const render = () => {
+      press(buttons, b => +b.dataset.cam === cam);
       placeThumb(seg);
 
       if (kind === 'studio') {
-        section.querySelectorAll('[data-price="studio"]').forEach(el => swap(el, fmt(studioPrice(cam))));
-        section.querySelectorAll('[data-price="full"]').forEach(el => swap(el, fmt(fullPrice(cam))));
+        if (placeSeg) {
+          press(placeButtons, b => b.dataset.place === place);
+          placeThumb(placeSeg);
+          placeTitles.forEach(el => { el.textContent = el.dataset[place]; });
+        }
+        section.querySelectorAll('[data-price="studio"]').forEach(el => swap(el, fmt(studioPrice(cam, place))));
+        section.querySelectorAll('[data-price="full"]').forEach(el => swap(el, fmt(fullPrice(cam, place))));
+        section.querySelectorAll('[data-price="reels"]').forEach(el => swap(el, fmt(reelsPrice(place))));
         section.querySelectorAll('[data-cam-label]').forEach(el => { el.textContent = camLabels[cam]; });
       } else {
         section.querySelectorAll('[data-tier]').forEach(card => {
@@ -61,15 +80,18 @@ export function initPricing({ camLabels, onCamChange }) {
           card.querySelector('[data-price="per"]').textContent = fmt(corpPerHour(tier, cam));
         });
       }
-      onCamChange?.(section, cam + 1);
+      onChange?.(section, { n: cam + 1, place });
     };
 
-    buttons.forEach(b => b.addEventListener('click', () => render(+b.dataset.cam)));
-    seg.classList.add('has-thumb');
-    render(0);
-
-    // Şrift yüklənəndə və ölçü dəyişəndə düymə enləri dəyişir
-    new ResizeObserver(() => placeThumb(seg)).observe(seg);
-    document.fonts?.ready.then(() => placeThumb(seg));
+    buttons.forEach(b => b.addEventListener('click', () => { cam = +b.dataset.cam; render(); }));
+    placeButtons.forEach(b => b.addEventListener('click', () => { place = b.dataset.place; render(); }));
+    for (const s of [seg, placeSeg]) {
+      if (!s) continue;
+      s.classList.add('has-thumb');
+      // Şrift yüklənəndə və ölçü dəyişəndə düymə enləri dəyişir
+      new ResizeObserver(() => placeThumb(s)).observe(s);
+      document.fonts?.ready.then(() => placeThumb(s));
+    }
+    render();
   }
 }

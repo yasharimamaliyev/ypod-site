@@ -78,6 +78,20 @@ export async function initHero3D() {
   rig.add(roll, buildFloorGlow());
   scene.add(rig);
 
+  // Xidmətlər bölməsinə keçəndə neon halqa titrəyib sönür (services BRIEF bölmə 10)
+  const ringMats = [];
+  spin.traverse(o => {
+    const m = o.material;
+    if (m?.emissive?.getHex() === 0xa855f7) ringMats.push({ m, key: 'emissiveIntensity', base: m.emissiveIntensity });
+    else if (m?.blending === THREE.AdditiveBlending && m.transparent) ringMats.push({ m, key: 'opacity', base: m.opacity });
+  });
+  let ring = 1;
+  const setRingIntensity = v => {
+    if (v === ring) return;
+    ring = v;
+    for (const r of ringMats) r.m[r.key] = r.base * v;
+  };
+
   let visH = 1, visW = 1, mobile = false;
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -126,10 +140,12 @@ export async function initHero3D() {
   const sub = hero.querySelector('.hero-sub');
   const ctas = hero.querySelector('.hero-ctas');
   const wm = hero.querySelector('.hero-wm');
+  const tail = hero.querySelector('.hero-tail');
 
   const tl = gsap.timeline({
     defaults: { ease: 'power3.out' },
-    scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom bottom', scrub: 0.6 },
+    // .hero-tail: hero animasiyası bitəndən sonra pin bir az da qalır, Xidmətlər onun üstündən başlayır (services.js)
+    scrollTrigger: { trigger: hero, start: 'top top', end: () => `bottom-=${tail?.offsetHeight || 0} bottom`, scrub: 0.6, invalidateOnRefresh: true },
   });
   tl.to(state, { p: 1, ease: 'none', duration: 1 }, 0)
     .fromTo(wm, { '--wma': 0.05, '--wms': 1 }, { '--wma': 0.035, '--wms': 1.08, ease: 'none', duration: 1 }, 0)
@@ -142,17 +158,26 @@ export async function initHero3D() {
   root.classList.add('is-3d-ready');
   ScrollTrigger.refresh();
 
-  // Render loop yalnız hero görünəndə işləyir
+  // Render loop yalnız hero görünəndə və üstü örtülməyəndə işləyir
   // Üzmə sıfır fazadan başlayır ki, statik şəkildən keçid sıçramasın
-  let raf = 0;
+  let raf = 0, inView = false, covered = false;
   const t0 = performance.now();
   const loop = now => { raf = requestAnimationFrame(loop); render((now - t0) / 1000); };
-  new IntersectionObserver(([e]) => {
-    if (e.isIntersecting && !raf) raf = requestAnimationFrame(loop);
-    else if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = 0; }
-  }).observe(hero);
+  const sync = () => {
+    const run = inView && !covered;
+    if (run && !raf) raf = requestAnimationFrame(loop);
+    else if (!run && raf) { cancelAnimationFrame(raf); raf = 0; }
+  };
+  new IntersectionObserver(([e]) => { inView = e.isIntersecting; sync(); }).observe(hero);
+  // Xidmətlər bölməsinin qaranlıq fonu hero-nu tam örtəndə 3D çəkilmir
+  const setCovered = v => {
+    if (v === covered) return;
+    covered = v;
+    canvas.style.visibility = v ? 'hidden' : '';
+    sync();
+  };
 
   new ResizeObserver(() => resize()).observe(canvas);
 
-  return { gsap, ScrollTrigger };
+  return { gsap, ScrollTrigger, hero: { setRingIntensity, setCovered } };
 }

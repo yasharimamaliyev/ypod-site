@@ -11,18 +11,18 @@ const reducedMotion = root.classList.contains('rm');
 /* ---------- WhatsApp linkləri ---------- */
 const waHref = text => `https://wa.me/${CONFIG.waNumber}?text=${encodeURIComponent(text)}`;
 
-function setWa(a, n) {
+function setWa(a, { n = 1, place = 'studio' } = {}) {
   const tpl = t.wa[a.dataset.wa] || t.wa.general;
-  a.href = waHref(tpl.replace('{N}', n ?? 1));
+  a.href = waHref(tpl.replace('{N}', n).replace('{P}', t.wa_place[place]));
   a.target = '_blank';
   a.rel = 'noopener';
 }
 document.querySelectorAll('[data-wa]').forEach(a => setWa(a));
 
-/* ---------- Qiymətlər (kamera seçimi WhatsApp mətninə də düşür) ---------- */
+/* ---------- Qiymətlər (kamera və yer seçimi WhatsApp mətninə də düşür) ---------- */
 initPricing({
   camLabels: [t.cams.c0, t.cams.c1, t.cams.c2],
-  onCamChange: (section, n) => section.querySelectorAll('[data-wa]').forEach(a => setWa(a, n)),
+  onChange: (section, choice) => section.querySelectorAll('[data-wa]').forEach(a => setWa(a, choice)),
 });
 
 /* ---------- Nav, Instagram ---------- */
@@ -85,6 +85,30 @@ function marquee(gsap, ScrollTrigger) {
   });
 }
 
+/* ---------- Xidmətlər: statik versiya (reduced-motion, zəif telefon) kart şəkillərini yaxınlaşanda çəkir ---------- */
+const svc = document.querySelector('.svc');
+if (svc && root.classList.contains('svc-static')) {
+  const io = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) return;
+    io.disconnect();
+    import('./services.js').then(m => m.initServicesStatic(svc));
+  }, { rootMargin: '600px 0px' });
+  io.observe(svc);
+}
+
+async function initServicesFilm(libs) {
+  if (!svc || !root.classList.contains('svc-anim')) return;
+  try {
+    const [{ initServices }, { ScrollToPlugin }] = await Promise.all([import('./services.js'), import('gsap/ScrollToPlugin')]);
+    libs.gsap.registerPlugin(ScrollToPlugin);
+    initServices(svc, { ...libs, hero: libs.hero || null });
+  } catch (err) {
+    console.warn('Xidmətlər animasiyası yüklənmədi, statik versiya göstərilir:', err);
+    root.classList.replace('svc-anim', 'svc-static');
+    import('./services.js').then(m => m.initServicesStatic(svc)).catch(() => {});
+  }
+}
+
 async function enhance() {
   if (reducedMotion) return;
   let libs = null;
@@ -108,6 +132,7 @@ async function enhance() {
     libs = { gsap, ScrollTrigger };
   }
   marquee(libs.gsap, libs.ScrollTrigger);
+  await initServicesFilm(libs);
 }
 
 // 3D ağır işdir: ilk toxunuş/scroll/siçan hərəkətinə qədər gözləyir. Statik şəkil ilk 3D kadrla eyni pozadadır.
