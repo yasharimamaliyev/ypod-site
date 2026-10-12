@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{{meta.title}}</title>
+  <meta name="description" content="{{=meta.description}}">
+  <meta name="theme-color" content="#0b0713">
+  <meta name="color-scheme" content="dark">
+  <meta name="ypod-root" content="{{ROOT}}">
+  <link rel="icon" href="{{ROOT}}favicon.svg" type="image/svg+xml">
+  {{ALTERNATES}}
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{=meta.title}}">
+  <meta property="og:description" content="{{=meta.description}}">
+  <meta property="og:locale" content="{{locale}}">
+  <!-- TODO: [OG ŞƏKLİ] 1200×630 hazır olanda: <meta property="og:image" content="..."> -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Şrift CSS-i səhifənin göstərilməsini bloklamır (display=swap) -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@700;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@700;900&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@700;900&display=swap"></noscript>
+  <link rel="stylesheet" href="{{ROOT}}styles/main.css">
+
+  <script>
+    // Cihazın 3D-ni çəkib-çəkmədiyi ilk boyamadan əvvəl yoxlanır
+    (function () {
+      var d = document.documentElement;
+      d.classList.add('js');
+      var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var weak = (navigator.hardwareConcurrency || 8) <= 4 && matchMedia('(pointer: coarse)').matches;
+      var gl = false;
+      try {
+        var c = document.createElement('canvas');
+        var ctx = c.getContext('webgl2') || c.getContext('webgl');
+        gl = !!ctx;
+        var lose = ctx && ctx.getExtension('WEBGL_lose_context');
+        if (lose) lose.loseContext();
+      } catch (e) {}
+      if (rm) d.classList.add('rm');
+      // can-3d: 3D yüklənməyə cəhd edilir. Hazır olana qədər statik hero (şəkil + mətn) görünür.
+      if (!rm && !weak && gl) {
+        d.classList.add('can-3d');
+        // main.js ümumiyyətlə yüklənməsə, statik hero-ya qayıt ki, mətn gizli qalmasın
+        setTimeout(function () { if (!window.__ypod) d.classList.remove('can-3d'); }, 5000);
+      }
+    })();
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Y Pod",
+    "description": "{{=meta.description}}",
+    "telephone": "+994555303532",
+    "openingHours": "Mo-Su 08:00-22:00",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Zaur Nudirəliyev küçəsi, 34A",
+      "addressLocality": "Bakı",
+      "addressCountry": "AZ"
+    },
+    "geo": { "@type": "GeoCoordinates", "latitude": 40.411221, "longitude": 49.857947 },
+    "sameAs": ["https://www.instagram.com/ypod.az/"]
+  }
+  </script>
+  <script id="ypod-i18n" type="application/json">{{RUNTIME_JSON}}</script>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="#top" aria-label="{{=nav.home_aria}}"><span class="logo-dot" aria-hidden="true"></span>Y POD</a>
+
+    <nav class="nav-links" aria-label="{{=nav.main_aria}}">
+      <a class="nl" href="#xidmetler">{{nav.services}}</a>
+      <a class="nl" href="#qiymetler">{{nav.prices}}</a>
+      <a class="nl" href="#korporativ">{{nav.corporate}}</a>
+      <a class="nl" href="#elaqe">{{nav.contact}}</a>
+    </nav>
+
+    <div class="nav-end">
+      <div class="lg" role="group" aria-label="{{=nav.lang_aria}}">
+        <a href="{{LANG_AZ}}" hreflang="az" lang="az" {{AZ_CURRENT}}>AZ</a>
+        <a href="{{LANG_EN}}" hreflang="en" lang="en" {{EN_CURRENT}}>EN</a>
+        <a href="{{LANG_RU}}" hreflang="ru" lang="ru" {{RU_CURRENT}}>RU</a>
+      </div>
+      <a class="btn btn-s btn-sm nav-call" href="tel:+994555303532">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>{{nav.call}}
+      </a>
+      <a class="btn btn-p btn-sm" data-wa="general" href="#elaqe">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.2A8.5 8.5 0 1 1 20 11.5z"/></svg>{{nav.book}}
+      </a>
+      <button class="ib menu-btn" type="button" aria-label="{{=nav.menu_open}}" aria-expanded="false" aria-controls="mmenu" data-label-open="{{=nav.menu_open}}" data-label-close="{{=nav.menu_close}}">
+        <svg class="i-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 9h14M5 15h14"/></svg>
+        <svg class="i-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobil menyu -->
+<div class="mmenu" id="mmenu" role="dialog" aria-modal="true" aria-label="{{=nav.menu_title}}" hidden>
+  <nav class="mmenu-links" aria-label="{{=nav.main_aria}}">
+    <a href="#xidmetler">{{nav.services}}</a>
+    <a href="#qiymetler">{{nav.prices}}</a>
+    <a href="#korporativ">{{nav.corporate}}</a>
+    <a href="#elaqe">{{nav.contact}}</a>
+  </nav>
+  <div class="mmenu-foot">
+    <div class="seg seg-lang" role="group" aria-label="{{=nav.lang_aria}}">
+      <a class="sg" href="{{LANG_AZ}}" hreflang="az" lang="az" {{AZ_CURRENT}}>AZ</a>
+      <a class="sg" href="{{LANG_EN}}" hreflang="en" lang="en" {{EN_CURRENT}}>EN</a>
+      <a class="sg" href="{{LANG_RU}}" hreflang="ru" lang="ru" {{RU_CURRENT}}>RU</a>
+    </div>
+    <a class="btn btn-s btn-block" href="tel:+994555303532">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>{{nav.call}}
+    </a>
+  </div>
+</div>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="hero" aria-label="{{=hero.aria}}">
+    <div class="hero-pin">
+      <div class="hero-wm" aria-hidden="true">Y POD</div>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <canvas class="hero-canvas" aria-hidden="true"></canvas>
+
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <span class="pill hero-pill"><span class="pill-dot" aria-hidden="true"></span>{{hero.pill}}</span>
+          <h1 class="hd hero-h1">{{hero.h1_lead}} <span class="mk">{{hero.h1_mark}}</span></h1>
+          <p class="mut hero-sub">{{hero.sub}}</p>
+          <div class="hero-ctas">
+            <a class="btn btn-p" data-wa="general" href="#elaqe">{{hero.cta}}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a class="btn btn-s" href="#qiymetler">{{hero.prices}}</a>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <img class="hero-mic" src="{{ROOT}}assets/mic-hero.webp" alt="" width="858" height="2000" decoding="async" fetchpriority="high">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ XİDMƏTLƏR ============ -->
+  <section class="sec" id="xidmetler">
+    <div class="wrap">
+      <header class="sec-head rv">
+        <p class="eb">{{services.eyebrow}}</p>
+        <h2 class="hd h2">{{services.title}}</h2>
+      </header>
+
+      <div class="bento">
+        <article class="panel panel-lg rv">
+          <p class="eb">{{services.podcast_eyebrow}}</p>
+          <h3 class="hd h3">{{services.podcast_a}}<span class="h3-dim">{{services.podcast_b}}</span></h3>
+          <p class="mut panel-text">{{services.podcast_text}}</p>
+          <ul class="tags">
+            <li class="pill">{{services.tag_1}}</li>
+            <li class="pill">{{services.tag_2}}</li>
+            <li class="pill">{{services.tag_3}}</li>
+            <li class="pill">{{services.tag_4}}</li>
+          </ul>
+          <div class="media-ph">
+            <span class="play" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fdf6ff"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+            <span>{{services.podcast_media}}</span>
+          </div>
+        </article>
+
+        <article class="panel panel-lg rv" style="--d:.1s">
+          <p class="eb">{{services.reels_eyebrow}}</p>
+          <h3 class="hd h3">{{services.reels_a}}<span class="h3-dim">{{services.reels_b}}</span></h3>
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="phone-screen">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 8.5h18M8 3l3 5.5M14 3l3 5.5"/><path d="M10 12v5l4.5-2.5z"/></svg>
+                <span>{{services.reels_media}}</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel panel-sm rv">
+          <span class="ico" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h1M7 8v8M11 5v14M15 8v8M19 10v4"/></svg></span>
+          <div class="panel-sm-body">
+            <p class="eb">{{services.edit_eyebrow}}</p>
+            <h3 class="hd h3-sm">{{services.edit_title}}</h3>
+          </div>
+        </article>
+
+        <article class="panel panel-sm rv" style="--d:.1s">
+          <span class="ico" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg></span>
+          <div class="panel-sm-body">
+            <p class="eb">{{services.mobile_eyebrow}}</p>
+            <h3 class="hd h3-sm">{{services.mobile_title}}</h3>
+            <p class="mut panel-text">{{services.mobile_text}}</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ƏSAS MESAJ ============ -->
+  <section class="msg" aria-label="{{=message.aria}}">
+    <div class="msg-glow" aria-hidden="true"></div>
+    <div class="wrap msg-in">
+      <h2 class="hd msg-h"><span class="msg-w rv">{{message.a}}</span><span class="msg-w msg-grad rv" style="--d:.12s">{{message.b}}</span></h2>
+      <p class="mut msg-text rv" style="--d:.24s">{{message.text}}</p>
+    </div>
+  </section>
+
+  <!-- ============ BRENDLƏR ============ -->
+  <section class="brands" aria-label="{{=brands.title}}">
+    <div class="wrap"><p class="eb eb-dim">{{brands.title}}</p></div>
+    <div class="mq">
+      <ul class="mq-t">
+        <li class="brand">PAŞA Bank</li>
+        <li class="brand">ORZAX</li>
+        <li class="brand">alyars</li>
+        <li class="brand" aria-hidden="true">PAŞA Bank</li>
+        <li class="brand" aria-hidden="true">ORZAX</li>
+        <li class="brand" aria-hidden="true">alyars</li>
+        <li class="brand" aria-hidden="true">PAŞA Bank</li>
+        <li class="brand" aria-hidden="true">ORZAX</li>
+        <li class="brand" aria-hidden="true">alyars</li>
+        <li class="brand" aria-hidden="true">PAŞA Bank</li>
+        <li class="brand" aria-hidden="true">ORZAX</li>
+        <li class="brand" aria-hidden="true">alyars</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ QİYMƏTLƏR ============ -->
+  <section class="sec sec-center" id="qiymetler" data-pricing="studio">
+    <div class="wrap">
+      <header class="sec-head rv">
+        <p class="eb">{{prices.eyebrow}}</p>
+        <h2 class="hd h2">{{prices.title}}</h2>
+        <p class="mut sec-sub">{{prices.sub}}</p>
+      </header>
+
+      <div class="seg-row rv">
+        <span class="seg-label" id="cams-a">{{cams.label}}</span>
+        <div class="seg seg-cams" role="group" aria-labelledby="cams-a">
+          <span class="seg-thumb" aria-hidden="true"></span>
+          <button class="sg on" type="button" data-cam="0" aria-pressed="true">{{cams.c0}}</button>
+          <button class="sg" type="button" data-cam="1" aria-pressed="false">{{cams.c1}}</button>
+          <button class="sg" type="button" data-cam="2" aria-pressed="false">{{cams.c2}}</button>
+        </div>
+      </div>
+
+      <div class="price-grid">
+        <article class="card price-card rv">
+          <h3 class="hd h-card">{{prices.studio_title}}</h3>
+          <ul class="ck">
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-cam-label>{{cams.c0}}</span></li>
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.studio_i2}}</li>
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.studio_i3}}</li>
+          </ul>
+          <div class="rule"></div>
+          <div class="price">
+            <div class="price-row"><span class="hd price-num" data-price="studio">70</span><span class="price-cur">{{prices.cur}}</span></div>
+            <span class="mut price-unit">{{prices.studio_unit}}</span>
+          </div>
+        </article>
+
+        <article class="card price-card rv" style="--d:.08s">
+          <h3 class="hd h-card">{{prices.edit_title}}</h3>
+          <ul class="ck">
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.edit_i1}}</li>
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.edit_i2}}</li>
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.edit_i3}}</li>
+          </ul>
+          <div class="rule"></div>
+          <div class="price">
+            <div class="price-row"><span class="hd price-num">100</span><span class="price-cur">{{prices.cur}}</span></div>
+            <span class="mut price-unit">{{prices.edit_unit}}</span>
+          </div>
+        </article>
+
+        <article class="card hi price-card rv" style="--d:.16s">
+          <div class="card-top">
+            <span class="pill">{{prices.full_pill}}</span>
+            <h3 class="hd h-card">{{prices.full_title}}</h3>
+          </div>
+          <ul class="ck ck-hi">
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><span data-cam-label>{{cams.c0}}</span>{{prices.full_i1_suffix}}</span></li>
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.full_i2}}</li>
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.full_i3}}</li>
+          </ul>
+          <div class="rule"></div>
+          <div class="price">
+            <div class="price-row"><span class="hd price-num" data-price="full">170</span><span class="price-cur">{{prices.cur}}</span></div>
+            <span class="mut price-unit">{{prices.full_unit}}</span>
+          </div>
+        </article>
+      </div>
+
+      <article class="panel reels-pack rv">
+        <div class="reels-pack-info">
+          <p class="eb">{{prices.reels_eyebrow}}</p>
+          <h3 class="hd h3-reels">{{prices.reels_title}}</h3>
+          <ul class="ck">
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.reels_i1}}</li>
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.reels_i2}}</li>
+            <li><svg class="ck-i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{prices.reels_i3}}</li>
+          </ul>
+        </div>
+        <div class="reels-pack-buy">
+          <div class="price">
+            <div class="price-row"><span class="hd price-num price-num-lg">150</span><span class="price-cur">{{prices.cur}}</span></div>
+            <span class="mut price-unit">{{prices.reels_unit}}</span>
+          </div>
+          <a class="btn btn-p" data-wa="reels" href="#elaqe">{{prices.reels_cta}}</a>
+        </div>
+      </article>
+
+      <div class="sec-cta rv">
+        <a class="btn btn-p" data-wa="full" href="#elaqe">{{prices.cta}}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ KORPORATİV ============ -->
+  <section class="sec sec-center corp" id="korporativ" data-pricing="corp">
+    <div class="wrap">
+      <header class="sec-head rv">
+        <p class="eb">{{corp.eyebrow}}</p>
+        <h2 class="hd h2 h2-corp">{{corp.title}}</h2>
+      </header>
+
+      <div class="seg-row rv">
+        <span class="seg-label" id="cams-b">{{cams.label}}</span>
+        <div class="seg seg-cams" role="group" aria-label="{{=corp.cams_aria}}">
+          <span class="seg-thumb" aria-hidden="true"></span>
+          <button class="sg on" type="button" data-cam="0" aria-pressed="true">{{cams.c0}}</button>
+          <button class="sg" type="button" data-cam="1" aria-pressed="false">{{cams.c1}}</button>
+          <button class="sg" type="button" data-cam="2" aria-pressed="false">{{cams.c2}}</button>
+        </div>
+      </div>
+
+      <div class="corp-grid">
+        <article class="card corp-card rv" data-tier="0">
+          <div class="corp-top"><span class="hd corp-h">5 {{corp.hours_unit}}</span><span class="pill">−10%</span></div>
+          <span class="mut corp-term">{{corp.term_0}}</span>
+          <div class="rule"></div>
+          <div class="price">
+            <s class="old"><span data-price="old">350</span> {{prices.cur}}</s>
+            <div class="price-row"><span class="hd price-num price-num-corp" data-price="now">315</span><span class="price-cur">{{prices.cur}}</span></div>
+            <span class="mut price-unit"><span data-price="per">63</span> {{corp.per_unit}}</span>
+          </div>
+        </article>
+
+        <article class="card corp-card rv" data-tier="1" style="--d:.08s">
+          <div class="corp-top"><span class="hd corp-h">10 {{corp.hours_unit}}</span><span class="pill">−20%</span></div>
+          <span class="mut corp-term">{{corp.term_1}}</span>
+          <div class="rule"></div>
+          <div class="price">
+            <s class="old"><span data-price="old">700</span> {{prices.cur}}</s>
+            <div class="price-row"><span class="hd price-num price-num-corp" data-price="now">560</span><span class="price-cur">{{prices.cur}}</span></div>
+            <span class="mut price-unit"><span data-price="per">56</span> {{corp.per_unit}}</span>
+          </div>
+        </article>
+
+        <article class="card corp-card rv" data-tier="2" style="--d:.16s">
+          <div class="corp-top"><span class="hd corp-h">15 {{corp.hours_unit}}</span><span class="pill">−30%</span></div>
+          <span class="mut corp-term">{{corp.term_2}}</span>
+          <div class="rule"></div>
+          <div class="price">
+            <s class="old"><span data-price="old">1 050</span> {{prices.cur}}</s>
+            <div class="price-row"><span class="hd price-num price-num-corp" data-price="now">735</span><span class="price-cur">{{prices.cur}}</span></div>
+            <span class="mut price-unit"><span data-price="per">49</span> {{corp.per_unit}}</span>
+          </div>
+        </article>
+
+        <article class="card hi corp-card rv" data-tier="3" style="--d:.24s">
+          <span class="best">{{corp.best}}</span>
+          <div class="corp-top"><span class="hd corp-h">20 {{corp.hours_unit}}</span><span class="pill">−40%</span></div>
+          <span class="mut corp-term">{{corp.term_3}}</span>
+          <div class="rule"></div>
+          <div class="price">
+            <s class="old"><span data-price="old">1 400</span> {{prices.cur}}</s>
+            <div class="price-row"><span class="hd price-num price-num-corp" data-price="now">840</span><span class="price-cur">{{prices.cur}}</span></div>
+            <span class="mut price-unit"><span data-price="per">42</span> {{corp.per_unit}}</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="corp-foot rv">
+        <p class="mut corp-note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d946ef" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>{{corp.note}}</p>
+        <a class="btn btn-p" data-wa="corp" href="#elaqe">{{corp.cta}}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INSTAGRAM ============ -->
+  <section class="sec sec-center ig-sec" id="instagram" aria-label="{{=ig.aria}}" hidden>
+    <div class="wrap">
+      <header class="sec-head rv">
+        <p class="eb">{{ig.eyebrow}}</p>
+        <h2 class="hd h2">{{ig.title}}</h2>
+      </header>
+      <div class="ig-grid" aria-busy="true"></div>
+      <a class="btn btn-s" href="https://www.instagram.com/ypod.az/" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg>{{ig.follow}}
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ ƏLAQƏ ============ -->
+  <section class="sec contact" id="elaqe">
+    <div class="contact-glow" aria-hidden="true"></div>
+    <div class="wrap contact-grid">
+      <div class="contact-main">
+        <p class="eb rv">{{contact.eyebrow}}</p>
+        <h2 class="hd h2 h2-contact rv">{{contact.title}}</h2>
+        <p class="mut sec-sub rv">{{contact.sub}}</p>
+        <div class="bigs rv">
+          <a class="big pr" data-wa="general" href="#elaqe">
+            <span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.2A8.5 8.5 0 1 1 20 11.5z"/></svg></span>
+            <span class="big-t">{{contact.wa}}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="big" href="https://ig.me/m/ypod.az" target="_blank" rel="noopener">
+            <span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg></span>
+            <span class="big-t">{{contact.ig}}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="big" href="tel:+994555303532">
+            <span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span>
+            <span class="big-t">{{contact.call}}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="card info-card rv">
+        <div class="info-body">
+          <div class="info-addr">
+            <span class="pin" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d946ef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+            <div class="info-addr-body">
+              <div class="kv"><span class="mut kv-k">{{contact.address_label}}</span><span class="kv-v kv-lg" data-address>{{contact.address}}</span></div>
+              <div class="info-links">
+                <a class="btn btn-s btn-sm" data-maps href="#" target="_blank" rel="noopener">{{contact.maps}} ↗</a>
+                <a class="btn btn-s btn-sm" data-waze href="#" target="_blank" rel="noopener">{{contact.waze}} ↗</a>
+              </div>
+            </div>
+          </div>
+          <div class="rule"></div>
+          <div class="kv-grid">
+            <div class="kv"><span class="mut kv-k">{{contact.hours_label}}</span><span class="kv-v">{{contact.hours}}</span></div>
+            <div class="kv"><span class="mut kv-k">{{contact.phone_label}}</span><a class="kv-v" href="tel:+994555303532">055 530 35 32</a></div>
+            <div class="kv"><span class="mut kv-k">Instagram</span><a class="kv-v" href="https://www.instagram.com/ypod.az/" target="_blank" rel="noopener">@ypod.az</a></div>
+          </div>
+        </div>
+        <div class="map" data-map-title="{{=contact.map_title}}">
+          <svg class="map-deco" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="#fdf6ff" stroke-opacity=".08" stroke-width="2"><path d="M80 0l60 300M240 0l-30 300M380 0l40 300M520 0l-50 300M0 60l600 30M0 180l600-20"/></g><path d="M0 140l600-20" stroke="#7c3aed" stroke-width="3"/><circle cx="300" cy="130" r="40" fill="rgba(168,85,247,.18)"/><circle cx="300" cy="130" r="9" fill="#a855f7" stroke="#fdf6ff" stroke-width="3"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span class="logo logo-foot">Y POD</span>
+    <span class="mut foot-copy">{{footer.copy}}</span>
+    <div class="foot-links">
+      <a class="nl" href="https://www.instagram.com/ypod.az/" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="{{ROOT}}js/main.js"></script>
+</body>
+</html>

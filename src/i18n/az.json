@@ -1,0 +1,145 @@
+{
+  "_status": "Əsas dil. Mətnlər BRIEF.md bölmə 5-dən hərfi-hərfinə götürülüb.",
+  "lang": "az",
+  "locale": "az_AZ",
+  "meta": {
+    "title": "Y Pod — podcast və video studiyası, Bakı",
+    "description": "Siz danışın. Çəkiliş, montaj və təhvil bizdən. Y Pod Bakıda tam xidmətli podcast və video studiyasıdır."
+  },
+  "nav": {
+    "home_aria": "Y Pod ana səhifə",
+    "main_aria": "Əsas naviqasiya",
+    "lang_aria": "Dil seçimi",
+    "services": "Xidmətlər",
+    "prices": "Qiymətlər",
+    "corporate": "Korporativ",
+    "contact": "Əlaqə",
+    "call": "Zəng edin",
+    "book": "Rezerv edin",
+    "menu_open": "Menyunu aç (bölmələr, zəng, dil)",
+    "menu_close": "Menyunu bağla",
+    "menu_title": "Menyu"
+  },
+  "hero": {
+    "aria": "Giriş",
+    "pill": "Podcast və video studiyası · Bakı",
+    "h1_lead": "Y Pod studiyasına",
+    "h1_mark": "xoş gəlmisiniz!",
+    "sub": "Siz danışın. Çəkiliş, montaj və təhvil bizdən.",
+    "cta": "Çəkilişə yazılın",
+    "prices": "Qiymətlər"
+  },
+  "services": {
+    "eyebrow": "Xidmətlər",
+    "title": "Siz danışın, qalanını biz edək",
+    "podcast_eyebrow": "Podcast çəkilişi",
+    "podcast_a": "1, 2 və ya 3 kamera",
+    "podcast_b": "Peşəkar görüntü, təmiz səs",
+    "podcast_text": "Operator, işıq və səs qurulumu daxildir. Studiyada 3 fərqli setup var.",
+    "tag_1": "Operator",
+    "tag_2": "İşıq",
+    "tag_3": "Səs",
+    "tag_4": "3 setup",
+    "podcast_media": "[FOTO / VİDEO: studiya çəkilişindən kadr, 16:10]",
+    "reels_eyebrow": "Reels çəkilişi",
+    "reels_a": "1 saat çəkiliş",
+    "reels_b": "5 hazır reels",
+    "reels_media": "[REELS NÜMUNƏSİ<br>9:16 video]",
+    "edit_eyebrow": "Podcast montajı",
+    "edit_title": "Kəsim, səs təmizləmə, final export",
+    "mobile_eyebrow": "Səyyar studiya",
+    "mobile_title": "Studiya sizin yanınıza gəlir",
+    "mobile_text": "Komanda avadanlıqla ofisinizə və ya istədiyiniz məkana gəlir."
+  },
+  "message": {
+    "aria": "Əsas mesaj",
+    "a": "Montaj",
+    "b": "gecikmir",
+    "text": "Bazarda ən çox şikayət edilən problem montajın gecikməsidir. Bizdə təhvil vaxtı çəkilişdən əvvəl bilinir və sabitdir."
+  },
+  "brands": {
+    "title": "Bizə etibar edən brendlər"
+  },
+  "cams": {
+    "label": "Kamera sayı",
+    "c0": "1 kamera",
+    "c1": "2 kamera",
+    "c2": "3 kamera"
+  },
+  "prices": {
+    "eyebrow": "Qiymətlər",
+    "title": "Nə daxildir və nə qədərdir",
+    "sub": "Tam xidmət qiyməti = çəkiliş + montaj",
+    "cur": "AZN",
+    "studio_title": "Studiya çəkilişi",
+    "studio_i2": "Operator",
+    "studio_i3": "İşıq və səs qurulumu",
+    "studio_unit": "1 saat",
+    "edit_title": "Podcast montajı",
+    "edit_i1": "Peşəkar kəsim",
+    "edit_i2": "Səs təmizləmə",
+    "edit_i3": "Final export",
+    "edit_unit": "1 saatlıq epizod",
+    "full_pill": "Tam xidmət",
+    "full_title": "Çəkiliş + montaj",
+    "full_i1_suffix": ", operator, işıq və səs",
+    "full_i2": "Peşəkar kəsim, səs təmizləmə",
+    "full_i3": "Final export",
+    "full_unit": "1 saatlıq epizod",
+    "reels_eyebrow": "Reels Paketi",
+    "reels_title": "1 saat çəkiliş + 5 hazır reels",
+    "reels_i1": "1 saatlıq çəkiliş",
+    "reels_i2": "Montajı ilə birlikdə 5 reels",
+    "reels_i3": "Instagram-a hazır",
+    "reels_unit": "paket",
+    "reels_cta": "Reels Paketi sifariş edin",
+    "cta": "Çəkilişə yazılın"
+  },
+  "corp": {
+    "eyebrow": "Korporativ təkliflər",
+    "title": "Müntəzəm çəkənlər üçün 40%-ə qədər endirim",
+    "cams_aria": "Korporativ paket üçün kamera sayı",
+    "hours_unit": "saat",
+    "term_0": "İstifadə müddəti: 2 ay",
+    "term_1": "İstifadə müddəti: 4 ay",
+    "term_2": "İstifadə müddəti: 8 ay",
+    "term_3": "İstifadə müddəti: 12 ay",
+    "per_unit": "AZN / saat",
+    "best": "Ən sərfəli seçim",
+    "note": "Montaj paketlərə daxil deyil: hər epizod üçün ayrıca 100 AZN",
+    "cta": "Korporativ təklif alın"
+  },
+  "ig": {
+    "aria": "Instagram: son çəkilişlər",
+    "eyebrow": "Instagram",
+    "title": "Son çəkilişlər",
+    "post_aria": "Instagram postu",
+    "follow": "@ypod.az-ı izləyin"
+  },
+  "contact": {
+    "eyebrow": "Əlaqə",
+    "title": "Çəkilişə yazılın",
+    "sub": "Bizə yazın, uyğun günü və setup-u birlikdə seçək.",
+    "wa": "WhatsApp-a yazın",
+    "ig": "Instagram-da yazın",
+    "call": "Zəng edin: 055 530 35 32",
+    "address_label": "Ünvan",
+    "address": "Zaur Nudirəliyev küçəsi, 34A, Bakı",
+    "hours_label": "İş saatları",
+    "hours": "Hər gün, 08:00–22:00",
+    "phone_label": "Telefon",
+    "maps": "Google Maps",
+    "waze": "Waze",
+    "map_title": "Y Pod studiyası xəritədə",
+    "map_load": "Xəritəni göstər"
+  },
+  "footer": {
+    "copy": "© 2026 Y Pod. Bakı."
+  },
+  "wa": {
+    "general": "Salam! Çəkilişə yazılmaq istəyirəm.",
+    "full": "Salam! Tam xidmət, {N} kamera haqqında məlumat almaq istəyirəm.",
+    "reels": "Salam! Reels Paketi sifariş etmək istəyirəm.",
+    "corp": "Salam! Korporativ təklif almaq istəyirəm ({N} kamera)."
+  }
+}

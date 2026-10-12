@@ -1,0 +1,83 @@
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  background: var(--c-bg);
+  color-scheme: dark;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-h);
+}
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-cream);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+h1, h2, h3, p, ul { margin: 0; }
+ul { padding: 0; list-style: none; }
+a { color: var(--c-cream); text-decoration: none; }
+a:hover { color: var(--c-fuchsia-500); }
+img, svg, canvas { display: block; }
+button { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+:focus-visible { outline: 2px solid var(--c-cream); outline-offset: 3px; border-radius: 4px; }
+
+.wrap {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-left: var(--gutter-x);
+  padding-right: var(--gutter-x);
+}
+
+/* Tipoqrafiya */
+.hd {
+  font-family: var(--f-display);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  text-wrap: balance;
+}
+.eb {
+  font: 700 12px/1 var(--f-body);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--c-fuchsia-500);
+}
+.eb-dim { color: rgba(253, 246, 255, .6); }
+.mut { color: var(--c-text-2); }
+
+.h2 { font-size: 32px; line-height: 1.1; }
+.h3 { font-size: 24px; line-height: 1.15; }
+.h3-dim { display: block; color: rgba(253, 246, 255, .5); }
+.h3-sm { font-size: 20px; line-height: 1.15; }
+
+@media (min-width: 768px) {
+  .eb { font-size: 13px; }
+  .h2 { font-size: 44px; line-height: 1.06; }
+  .h3 { font-size: 32px; line-height: 1.1; }
+  .h3-sm { font-size: 24px; }
+}
+@media (min-width: 1024px) {
+  .h2 { font-size: 52px; line-height: 1.05; }
+  .h3 { font-size: 40px; line-height: 1.08; }
+  .h3-sm { font-size: 28px; }
+}
+@media (min-width: 1280px) {
+  .h2 { font-size: 60px; }
+}
+
+/* Scroll-da görünmə (JS IntersectionObserver ilə "in" əlavə edir) */
+.js .rv {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity .9s var(--ease-out) var(--d, 0s), transform .9s var(--ease-out) var(--d, 0s);
+}
+.js .rv.in { opacity: 1; transform: none; }
+.rm .rv { opacity: 1 !important; transform: none !important; transition: none !important; }

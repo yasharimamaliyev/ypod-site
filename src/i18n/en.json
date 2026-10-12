@@ -1,0 +1,145 @@
+{
+  "_status": "TODO: qaralama tərcümə. Saytı canlıya çıxarmazdan əvvəl ingiliscəni yaxşı bilən biri yoxlamalıdır.",
+  "lang": "en",
+  "locale": "en_US",
+  "meta": {
+    "title": "Y Pod — podcast and video studio in Baku",
+    "description": "You talk. Filming, editing and delivery are on us. Y Pod is a full-service podcast and video studio in Baku."
+  },
+  "nav": {
+    "home_aria": "Y Pod home",
+    "main_aria": "Main navigation",
+    "lang_aria": "Language",
+    "services": "Services",
+    "prices": "Pricing",
+    "corporate": "Corporate",
+    "contact": "Contact",
+    "call": "Call us",
+    "book": "Book now",
+    "menu_open": "Open menu (sections, call, language)",
+    "menu_close": "Close menu",
+    "menu_title": "Menu"
+  },
+  "hero": {
+    "aria": "Intro",
+    "pill": "Podcast and video studio · Baku",
+    "h1_lead": "Welcome to",
+    "h1_mark": "Y Pod studio!",
+    "sub": "You talk. Filming, editing and delivery are on us.",
+    "cta": "Book a shoot",
+    "prices": "Pricing"
+  },
+  "services": {
+    "eyebrow": "Services",
+    "title": "You talk, we handle the rest",
+    "podcast_eyebrow": "Podcast production",
+    "podcast_a": "1, 2 or 3 cameras",
+    "podcast_b": "Professional picture, clean sound",
+    "podcast_text": "Camera operator, lighting and sound setup included. The studio has 3 different sets.",
+    "tag_1": "Operator",
+    "tag_2": "Lighting",
+    "tag_3": "Sound",
+    "tag_4": "3 sets",
+    "podcast_media": "[PHOTO / VIDEO: frame from a studio shoot, 16:10]",
+    "reels_eyebrow": "Reels production",
+    "reels_a": "1 hour of filming",
+    "reels_b": "5 ready-to-post reels",
+    "reels_media": "[REELS SAMPLE<br>9:16 video]",
+    "edit_eyebrow": "Podcast editing",
+    "edit_title": "Cutting, audio cleanup, final export",
+    "mobile_eyebrow": "Mobile studio",
+    "mobile_title": "The studio comes to you",
+    "mobile_text": "Our team brings the equipment to your office or any location you choose."
+  },
+  "message": {
+    "aria": "Key message",
+    "a": "Editing",
+    "b": "on time",
+    "text": "Late editing is the most common complaint in the market. With us, the delivery date is known before the shoot and it does not move."
+  },
+  "brands": {
+    "title": "Brands that trust us"
+  },
+  "cams": {
+    "label": "Cameras",
+    "c0": "1 camera",
+    "c1": "2 cameras",
+    "c2": "3 cameras"
+  },
+  "prices": {
+    "eyebrow": "Pricing",
+    "title": "What is included and what it costs",
+    "sub": "Full service price = filming + editing",
+    "cur": "AZN",
+    "studio_title": "Studio filming",
+    "studio_i2": "Camera operator",
+    "studio_i3": "Lighting and sound setup",
+    "studio_unit": "1 hour",
+    "edit_title": "Podcast editing",
+    "edit_i1": "Professional cutting",
+    "edit_i2": "Audio cleanup",
+    "edit_i3": "Final export",
+    "edit_unit": "1-hour episode",
+    "full_pill": "Full service",
+    "full_title": "Filming + editing",
+    "full_i1_suffix": ", operator, lighting and sound",
+    "full_i2": "Professional cutting, audio cleanup",
+    "full_i3": "Final export",
+    "full_unit": "1-hour episode",
+    "reels_eyebrow": "Reels Package",
+    "reels_title": "1 hour of filming + 5 ready reels",
+    "reels_i1": "1 hour of filming",
+    "reels_i2": "5 reels, editing included",
+    "reels_i3": "Ready for Instagram",
+    "reels_unit": "package",
+    "reels_cta": "Order the Reels Package",
+    "cta": "Book a shoot"
+  },
+  "corp": {
+    "eyebrow": "Corporate packages",
+    "title": "Up to 40% off for regular shoots",
+    "cams_aria": "Cameras for the corporate package",
+    "hours_unit": "hours",
+    "term_0": "Valid for 2 months",
+    "term_1": "Valid for 4 months",
+    "term_2": "Valid for 8 months",
+    "term_3": "Valid for 12 months",
+    "per_unit": "AZN / hour",
+    "best": "Best value",
+    "note": "Editing is not included in packages: 100 AZN per episode",
+    "cta": "Get a corporate offer"
+  },
+  "ig": {
+    "aria": "Instagram: latest shoots",
+    "eyebrow": "Instagram",
+    "title": "Latest shoots",
+    "post_aria": "Instagram post",
+    "follow": "Follow @ypod.az"
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Book a shoot",
+    "sub": "Message us and we will pick the right day and set together.",
+    "wa": "Message on WhatsApp",
+    "ig": "Message on Instagram",
+    "call": "Call: +994 55 530 35 32",
+    "address_label": "Address",
+    "address": "34A Zaur Nudiraliyev St, Baku",
+    "hours_label": "Opening hours",
+    "hours": "Every day, 08:00–22:00",
+    "phone_label": "Phone",
+    "maps": "Google Maps",
+    "waze": "Waze",
+    "map_title": "Y Pod studio on the map",
+    "map_load": "Show map"
+  },
+  "footer": {
+    "copy": "© 2026 Y Pod. Baku."
+  },
+  "wa": {
+    "general": "Hello! I would like to book a shoot.",
+    "full": "Hello! I would like to know more about the full service with {N} camera(s).",
+    "reels": "Hello! I would like to order the Reels Package.",
+    "corp": "Hello! I would like a corporate offer ({N} camera(s))."
+  }
+}
