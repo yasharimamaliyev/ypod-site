@@ -103,7 +103,7 @@ Domen (`ypod.az`) bağlananda: Settings → Variables → `SITE_URL=https://ypod
 | Google Maps profili | koordinatla axtarış linki (`config.js` → `mapsUrl`) |
 | Studiya setup-ları (Xidmətlər filmi) | real foto yoxdur, stilizə edilmiş SVG |
 | Y POD loqosu (kamera, furqon) | Unbounded mətni, rəsmi SVG gələndə əvəz et |
-| Brend loqoları | PAŞA Bank, ORZAX, alyars hələlik mətnlə (zolaq siçanla və barmaqla sağa-sola sürüşdürülür, `main.js` → `marquee`) |
+| Brend loqoları | 11 brend hələlik mətnlə (`template.html` → BRENDLƏR; sayı dəyişəndə zolağın müddəti də dəyişir) (zolaq siçanla və barmaqla sağa-sola sürüşdürülür, `main.js` → `marquee`) |
 | Instagram | bölmə gizlidir, worker qoşulmayıb |
 | EN / RU | qaralama tərcümə, dil bilən biri yoxlamalıdır |
 | OG şəkli | 1200×630, yoxdur |

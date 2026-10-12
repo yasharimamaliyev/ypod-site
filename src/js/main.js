@@ -72,7 +72,7 @@ function marquee(gsap, ScrollTrigger) {
   track.classList.add('is-gsap');
   const tween = gsap.to(track, {
     xPercent: -50, ease: 'none', repeat: -1,
-    duration: () => (innerWidth >= 1024 ? 36 : 18),
+    duration: () => (innerWidth >= 1024 ? 75 : 44), // ~41–43 px/s; brend sayı dəyişəndə: müddət = zolağın yarı eni / 42
   });
   let settle;
   ScrollTrigger.create({

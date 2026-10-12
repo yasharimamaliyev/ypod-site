@@ -189,12 +189,12 @@
 }
 .mq.is-drag { cursor: grabbing; }
 .mq.is-drag .brand { transition: none; }
-.mq-t { display: flex; width: max-content; animation: mq 18s linear infinite; will-change: transform; }
+.mq-t { display: flex; width: max-content; animation: mq 44s linear infinite; will-change: transform; }
 .mq-t.is-gsap { animation: none; }
 @keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (min-width: 1024px) {
   .brand { height: 72px; min-width: 220px; padding: 0 32px; margin-right: 24px; border-radius: 16px; font-size: 28px; }
-  .mq-t { animation-duration: 36s; }
+  .mq-t { animation-duration: 75s; }
 }
 @media (prefers-reduced-motion: reduce) { .mq-t { animation: none; } }
 
