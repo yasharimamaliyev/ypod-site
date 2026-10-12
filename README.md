@@ -42,9 +42,11 @@ Qiymət dəyişəndə üç yer yenilənir: `src/js/pricing.js`, testdəki gözl�
 
 ## Xidmətlər filmi necə işləyir
 
-- Hero-dan sonra bölmə ekrana bərkidilir (CSS sticky). 6 səhnə: 1 kamera → 2 kamera → 3 nəfər → Reels → Səyyar studiya → Montaj, sonda "Montaj gecikmir".
+- Hero-dan sonra bölmə ekrana bərkidilir: aktiv olanda `position: fixed` (`is-active`), sonra bölmənin dibində (`is-past`). Sticky iOS/Safari-də scroll zamanı əsirdi. 6 səhnə: 1 kamera → 2 kamera → 3 nəfər → Reels → Səyyar studiya → Montaj, sonda "Montaj gecikmir".
 - Scroll uzunluğu = dizayndakı 700vh (mobil 600vh) + hər səhnənin sonunda "dayanma" (`HOLDS`, `STRETCH` — `services-stage.js`). Dayanmanı dəyişəndə `sections.css`-dəki bölmə hündürlüyünü də yenilə; `npm test` uyğunsuzluğu tutur.
 - Chip (qiymət) öz səhnəsinin mətni ilə birlikdə gəlir və gedir. Addım düymələri səhnənin bitdiyi ana (dayanmanın başına) aparır.
+- Addım-addım scroll: film zonasında təkər, toxunma və klaviatura səhifəni birbaşa sürüşdürmür, hər jest növbəti dayanmaya aparır (`buildScale().stops`, `services.js` → `step`). Zonanın kənarında (filmin başı, final) adi scroll-dur. Zonaya kənardan ətalətlə girən scroll da dayanmada kəsilir.
+- S5b-də həkim qolunu qaldırır (scroll-a bağlı) və dayanmada əl edir (zamana bağlı, GSAP). Qol SVG-yə çevirmə skriptində əlavə olunur (`arxiv/dc-stage-to-svg.mjs`).
 - Bütün dəyərlər scroll faizindən (`p`) `computeStage()`-də hesablanır. Mətnlər HTML-dədir (`template.html` + i18n `services.*`), SVG-də mətn yoxdur.
 - 3D hero olanda bölmə hero-nun son ekranının üstündən başlayır: hero pin-i `--hero-tail` qədər yerində qalır, mətn çıxır, halqa söner (`setRingIntensity`), ekran qaralır. Tam qaralandan sonra 3D çəkilmir (`setCovered`): Safari-də S0–S1 titrəməsi bundan idi. Kameraların blur filtri götürülüb (Safari-də SVG filtri ağırdır).
 - Safari hər SVG dəyişikliyində bütün səhnəni yenidən çəkir. Ona görə canlı detallar (SMIL: toz, nəbz, REC) film hərəkətdə olanda dayanır və kadr sakitləşəndən 0.3 s sonra davam edir. Vinyet SVG-də deyil, ayrıca CSS qatındadır (`.svc-vig`).

@@ -414,7 +414,6 @@
 <path d="M-60 6V-162Q-60 -190 -32 -192H32Q60 -190 60 -162V6Z" fill="#1d1628"></path>
 <path d="M-82 6V-96Q-82 -126 -52 -132L-16 -140Q0 -124 16 -140L52 -132Q82 -126 82 -96V6Z" fill="url(#gCoat)"></path>
 <path d="M-82 -96Q-98 -48 -86 6H-60Q-68 -46 -64 -90Z" fill="#8f879e"></path>
-<path d="M82 -96Q98 -48 86 6H60Q68 -46 64 -90Z" fill="#8f879e"></path>
 <path d="M-16 -140L0 -98L16 -140Q0 -126 -16 -140Z" fill="#4b3d63"></path>
 <path d="M-16 -140L-4 -100L-22 -84M16 -140L4 -100L22 -84" fill="none" stroke="#7d7590" stroke-width="2.5" stroke-linejoin="round"></path>
 <path d="M0 -98V6" stroke="#7d7590" stroke-width="2"></path>
@@ -429,12 +428,32 @@
 </g>
 <g id="doctor-body-lit">
 <path d="M82 -96Q82 -126 52 -132L22 -138Q30 -110 34 -60L40 6H82Z" fill="#f4effa" opacity=".7"></path>
-<path d="M82 -96Q98 -48 86 6H72Q80 -46 74 -92Z" fill="#f4effa" opacity=".5"></path>
 <path d="M82.5 -96V6" stroke="#fdf6ff" stroke-width="2.5" opacity=".8"></path>
 <path d="M-82.5 -96V6" stroke="#a855f7" stroke-width="2.5"></path>
 <path d="M-52 -132L-16 -140M16 -140L52 -132" stroke="#fdf6ff" stroke-opacity=".55" stroke-width="2"></path>
 <path d="M18 -140Q38 -128 39 -104" fill="none" stroke="#fdf6ff" stroke-opacity=".35" stroke-width="1.5"></path>
 <circle cx="-27" cy="-49" r="2.5" fill="#fdf6ff" opacity=".7"></circle>
+</g>
+<g id="doctor-uarm-dark">
+<path d="M62 -98Q62 -113 75 -113Q88 -113 88 -98L91 -44Q75 -36 59 -44Z" fill="#8f879e"></path>
+</g>
+<g id="doctor-uarm-lit">
+<path d="M80 -112Q88 -108 88 -98L91 -44Q86 -41 80 -40Z" fill="#f4effa" opacity=".5"></path>
+<path d="M88 -98L91 -44" stroke="#fdf6ff" stroke-width="2" opacity=".6"></path>
+</g>
+<g id="doctor-farm-dark">
+<circle cx="75" cy="-44" r="15" fill="#8f879e"></circle>
+<path d="M61 -46H89L86 -4H64Z" fill="#8f879e"></path>
+<rect x="63" y="-9" width="24" height="7" rx="2" fill="#d8d1e3"></rect>
+</g>
+<g id="doctor-farm-lit">
+<path d="M81 -58Q90 -52 89 -44L86 -4H80Z" fill="#f4effa" opacity=".5"></path>
+</g>
+<g id="doctor-hand">
+<path d="M65 -3Q64 14 68 22Q75 27 83 22Q87 14 85 -3Z" fill="#7a5d70"></path>
+<path d="M66 18L64 30M71 21L70 34M77 21L78 34M82 18L85 29" stroke="#7a5d70" stroke-width="5" stroke-linecap="round"></path>
+<path d="M66 6Q60 8 58 16" stroke="#7a5d70" stroke-width="5" stroke-linecap="round" fill="none"></path>
+<path d="M80 0Q86 6 84 18" stroke="#c4a3b6" stroke-width="3" stroke-linecap="round" fill="none" opacity=".8"></path>
 </g>
 <g id="doctor-head-dark">
 <rect x="-12" y="-160" width="24" height="26" rx="7" fill="#6a5062"></rect>
@@ -489,6 +508,9 @@
 <use href="#doctor-body-dark"></use>
 <use href="#doctor-body-lit" data-t-opacity="{{s.cil}}"></use>
 <g data-t-transform="rotate({{s.dhr}} 0 -150)"><use href="#doctor-head-dark"></use><use href="#doctor-head-lit" data-t-opacity="{{s.cil}}"></use></g>
+<g data-t-transform="rotate({{s.dua}} 75 -104)"><use href="#doctor-uarm-dark"></use><use href="#doctor-uarm-lit" data-t-opacity="{{s.cil}}"></use>
+<g data-t-transform="rotate({{s.dfa}} 75 -44)"><use href="#doctor-farm-dark"></use><use href="#doctor-farm-lit" data-t-opacity="{{s.cil}}"></use><use href="#doctor-hand" data-t-opacity="{{s.dho}}"></use></g>
+</g>
 </g>
 <g transform="translate(0 46)"><use href="#clinic-desk"></use><use href="#clinic-desk-lit" data-t-opacity="{{s.cil}}"></use></g>
 <g transform="translate(-34 54)"><use href="#mic"></use><use href="#mic-lit" data-t-opacity="{{s.cil}}"></use></g>

@@ -30,12 +30,12 @@ export const HOLDS = [
   [0.31, 0.4],   // S2
   [0.455, 0.4],  // S3
   [0.613, 0.5],  // S4 Reels, 5/5
-  [0.745, 0.4],  // S5 furqon yolda
   [0.8, 0.4],    // S5b həkim kabineti (v3-ün əsas kadrı)
   [0.963, 0.4],  // S6 "Hazırdır"
   [1, 0.4],      // Final: pin buraxılmazdan əvvəl
 ];
-export const STRETCH = [[0.577, 0.613, 1.5]];               // Reels kartlarının düzülməsi 1.5× yavaş
+// Reels kartlarının düzülməsi 1.5×, avadanlığın çamadanlara yığılıb furqona girməsi 1.25× yavaş
+export const STRETCH = [[0.577, 0.613, 1.5], [0.635, 0.711, 1.25]];
 
 // Ekran vahidində (u) düyün nöqtələri: [u, p]. Dayanmada p dəyişmir.
 export function buildScale(base) {
@@ -54,6 +54,9 @@ export function buildScale(base) {
     if (hold) { u += hold[1]; knots.push([u, p]); }
   }
   const total = u;
+  // Addım-addım scroll üçün dayanacaqlar: [başlanğıc, son] (u); ilki filmin başı, sonuncu final dayanması
+  const stops = [[0, 0]];
+  for (const [p, h] of HOLDS) { const a = knots.find(k => k[1] === p)[0]; stops.push([a, a + h]); }
   const pAt = x => {
     if (x <= 0) return 0;
     for (let i = 1; i < knots.length; i++) {
@@ -70,22 +73,24 @@ export function buildScale(base) {
     }
     return total;
   };
-  return { total, pAt, uAt };
+  return { total, pAt, uAt, stops };
 }
 // Statik versiyanın kart şəkilləri (BRIEF bölmə 9)
 export const STATIC_KEYS = [0.175, 0.31, 0.455, 0.613, 0.8, 0.958];
 
 // [giriş a, b, çıxış c, d] — mətn blokları S1…S6
-const TX = [[0.125, 0.147, 0.2, 0.214], [0.232, 0.252, 0.34, 0.354], [0.385, 0.405, 0.48, 0.494], [0.556, 0.574, 0.62, 0.634], [0.652, 0.672, 0.826, 0.838], [0.838, 0.856, 0.962, 0.972]];
+const TX = [[0.125, 0.147, 0.2, 0.214], [0.232, 0.252, 0.34, 0.354], [0.385, 0.405, 0.48, 0.494], [0.556, 0.574, 0.62, 0.634], [0.711, 0.728, 0.826, 0.838], [0.838, 0.856, 0.962, 0.972]];
 // Chip-lər: [giriş a, b, çıxış c, d]; etiketlər HTML-dədir
+const FIN_SHIFT = 420; // art vahidi
 const EDIT_STEPS = [[0.852, 0.897], [0.897, 0.935], [0.935, 0.964]];
 
 /**
  * @param {number} p scroll faizi 0–1
  * @param {{ax:number, ay:number, as:number}} Lt "#art" yerləşməsi
  * @param {{digits:number[]}} chipInfo hər chip-in rəqəm sayı
+ * @param {number} [wave] həkimin əl etməsi, dərəcə (zamana bağlıdır, services.js verir)
  */
-export function computeStage(p, Lt, chipInfo) {
+export function computeStage(p, Lt, chipInfo, wave = 0) {
   p = p >= 0 ? (p > 1 ? 1 : p) : 0;
   const K = ks => {
     if (p <= ks[0][0]) return ks[0][1];
@@ -246,6 +251,10 @@ export function computeStage(p, Lt, chipInfo) {
   const env = R(0.795, 0.803) * (1 - R(0.815, 0.82));
   s.dhr = n(2.4 * Math.sin((p - 0.8) * 900) * env);
   s.dct = 'translate(' + n(1.6 * Math.sin((p - 0.8) * 650) * env) + ' 46)';
+  // Kabinetə çatanda həkim qolunu qaldırır (dirsək yana, əl yuxarı), çıxanda endirir
+  const arm = R(0.789, 0.8, 'o3') * (1 - R(0.812, 0.82));
+  s.dua = n(-70 * arm); s.dfa = n((-110 + wave) * arm);
+  s.dho = n(R(0.789, 0.793) * (1 - R(0.816, 0.82)));
   s.vanl = K([[0, 0], [0.712, 0], [0.72, 1]]);
   s.beam = n(FL(0.714, 0.724));
   s.door = n(K([[0, 1], [0.711, 1], [0.717, 0.06]]));
@@ -256,6 +265,8 @@ export function computeStage(p, Lt, chipInfo) {
   const eg = R(0.832, 0.852, 'i3');
   let esc = L(s0, 1, eg), etx = L(lcdAX - 350 * s0, 150, eg), ety = L(lcdAY - 280 * s0, 120, eg);
   if (p >= 0.852) { const fs = 1 - 0.06 * R(0.962, 0.975); esc = fs; etx = 150 + 350 * (1 - fs); ety = 120 + 280 * (1 - fs); }
+  // Desktop finalı: montaj pəncərəsi "Montaj gecikmir" mətninin arxasından sağa çəkilir
+  if (Lt.desk) etx += FIN_SHIFT * R(0.962, 0.985, 'i2');
   s.edt = tr(etx, ety, esc);
   s.edo = K([[0, 0], [0.832, 0], [0.838, 1], [0.962, 1], [0.975, 0.12]]);
   s.edu = K([[0, 0], [0.84, 0], [0.852, 1]]);
@@ -311,7 +322,7 @@ export function computeStage(p, Lt, chipInfo) {
   });
 
   /* v2: S5 note, window shade during zoom, text/indicator shades (desktop) */
-  const note = { o: chips[4].o, y: n((1 - R(0.652, 0.672, 'o3')) * 10 + chips[4].y) };
+  const note = { o: chips[4].o, y: n((1 - R(0.711, 0.728, 'o3')) * 10 + chips[4].y) };
   s.wdk = n(K([[0, 0], [0.82, 0], [0.84, 0.85]]));
   const shadeCopy = n(K([[0, 0], [0.1, 0], [0.125, 1], [0.962, 1], [0.972, 0]]));
   const shadeSteps = n(K([[0, 0], [0.04, 0], [0.062, 1], [0.832, 1], [0.852, 0.45]]));

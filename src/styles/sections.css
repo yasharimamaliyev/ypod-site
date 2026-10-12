@@ -207,7 +207,7 @@
 /* ---- Xidmətlər: scroll filmi ---- */
 /* Hündürlük = ekran + scroll məsafəsi. Məsafə services-stage.js-dəki buildScale().total-dır (dizayn 600/700vh + dayanmalar);
    rəqəm dəyişəndə burada da dəyiş (tests/services.test.mjs yoxlayır). */
-.svc-anim .svc { height: 1080.8vh; height: 1080.8svh; padding: 0; overflow-x: clip; }
+.svc-anim .svc { height: 1052.2vh; height: 1052.2svh; padding: 0; overflow-x: clip; }
 /* Nav linki S0-ın dayanmasının başına (p 4% = 0.24 ekran) aparır */
 .svc-anim .svc { scroll-margin-top: calc(-1 * var(--nav-h) - 24vh); scroll-margin-top: calc(-1 * var(--nav-h) - 24svh); }
 /* 3D hero: bölmə hero-nun son ekranının üstündən başlayır (BRIEF bölmə 10). Keçidin ilk 3%-ində (--hero-tail)
@@ -217,9 +217,13 @@
 .svc-anim.can-3d .svc { margin-top: calc(-100vh - var(--hero-tail)); margin-top: calc(-100svh - var(--hero-tail)); }
 .hero-tail { position: absolute; width: 0; height: var(--hero-tail, 0); visibility: hidden; pointer-events: none; }
 .svc-anim .svc-pin {
-  position: sticky; top: 0; max-width: none; padding: 0;
+  position: absolute; top: 0; left: 0; right: 0; max-width: none; padding: 0;
   height: 100vh; height: 100svh; overflow: hidden; pointer-events: none;
 }
+/* Pin: bölmə aktiv olanda fixed, sonra bölmənin dibində (GSAP pin kimi; services.js → is-active / is-past).
+   Sticky iOS/Safari-də scroll zamanı hər kadr 1–3 px əsirdi: sticky element scroll axını ilə sinxron çəkilmir. */
+.svc-anim .svc.is-active .svc-pin { position: fixed; }
+.svc-anim .svc.is-past .svc-pin { top: auto; bottom: 0; }
 .svc-anim .svc-bg { display: block; position: absolute; inset: 0; background: var(--c-bg); opacity: 0; }
 .svc-anim .svc-art { display: block; position: absolute; inset: 0; }
 .svc-anim .svc-art svg { position: absolute; left: 0; top: 0; }
@@ -280,7 +284,7 @@
 .svc-anim .svc.is-active .svc-txt, .svc-anim .svc.is-active .svc-chip { will-change: transform, opacity; }
 
 @media (min-width: 1024px) {
-  .svc-anim .svc { height: 1182.6vh; height: 1182.6svh; scroll-margin-top: calc(-1 * var(--nav-h) - 28vh); scroll-margin-top: calc(-1 * var(--nav-h) - 28svh); }
+  .svc-anim .svc { height: 1155.9vh; height: 1155.9svh; scroll-margin-top: calc(-1 * var(--nav-h) - 28vh); scroll-margin-top: calc(-1 * var(--nav-h) - 28svh); }
   .svc-anim.can-3d { --hero-tail: 21vh; --hero-tail: 21svh; }
   .svc-anim.can-3d .hero { height: calc(250vh + var(--hero-tail)); }
   .svc-anim .svc-shade { display: block; position: absolute; top: var(--nav-h); bottom: 0; opacity: 0; }

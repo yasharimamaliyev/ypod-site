@@ -1,8 +1,9 @@
 // Xidmətlər: scroll filmi (svc-anim) və statik kartlar (svc-static).
 // Səhnənin bütün dəyərləri services-stage.js-dən gəlir; burada yalnız DOM-a yazılır.
-// Pin CSS sticky ilə edilir (hero kimi): bölmənin hündürlüyü ilk boyamadan bilinir, səhifə sıçramır.
+// Pin CSS ilə edilir: bölmənin hündürlüyü ilk boyamadan bilinir, səhifə sıçramır. Aktiv olanda fixed (is-active),
+// sonra bölmənin dibində (is-past). Sticky iOS/Safari-də scroll zamanı əsirdi.
 import stageSvg from '../assets/services-stage.svg?raw';
-import { computeStage, buildScale, BASE_SCREENS, STEP_KEYS, STATIC_KEYS } from './services-stage.js';
+import { computeStage, buildScale, BASE_SCREENS, HOLDS, STEP_KEYS, STATIC_KEYS } from './services-stage.js';
 
 const DESKTOP = 1024;
 
@@ -138,18 +139,38 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
     liveTimer = setTimeout(() => live(visible), 300);
   }
 
+  // Həkimin əl etməsi (S5b dayanması): zamana bağlıdır, çünki dayanmada scroll, deməli p da dayanır
+  const WAVE_P = STEP_KEYS[4];
+  const W = { a: 0, ph: 0 };
+  let waveTl = null, waveCall = null;
+  function waveOn(on) {
+    if (on === Boolean(waveTl || waveCall)) return;
+    gsap.killTweensOf(W);
+    waveCall?.kill(); waveTl?.kill(); waveCall = waveTl = null;
+    if (!on) { gsap.to(W, { a: 0, duration: 0.25, onUpdate: () => render(false) }); return; }
+    // dayanmanın üstündən keçəndə əl etməsin: kadr bir az yerində qalmalıdır
+    waveCall = gsap.delayedCall(0.35, () => {
+      waveCall = null;
+      waveTl = gsap.timeline({ repeat: -1, repeatDelay: 2.2, onUpdate: () => render(false) })
+        .fromTo(W, { ph: 0 }, { ph: Math.PI * 5, duration: 1.7, ease: 'none' }, 0)
+        .fromTo(W, { a: 0 }, { a: 1, duration: 0.25, ease: 'power1.out' }, 0)
+        .to(W, { a: 0, duration: 0.35, ease: 'power1.in' }, 1.35);
+    });
+  }
+
   let L = layout(1, 1);
   let scale = buildScale(BASE_SCREENS.desktop);
   const state = { q: 0 }; // scroll irəliləyişi 0–1; dizayndakı p dayanmalarla birlikdə ondan hesablanır
 
-  function render() {
+  function render(scrolling = true) {
     const p = scale.pAt(state.q * scale.total);
-    const st = computeStage(p, L, info);
+    const st = computeStage(p, L, info, W.a * 16 * Math.sin(W.ph));
     // Hero-dan keçid: vinyet də qaranlıqla birlikdə gəlir ki, hero-nun üstündə kənar qaralması görünməsin
     st.s.vig = Math.round(st.s.vig * Math.min(1, p / 0.026) * 100) / 100;
     applyBindings(bindings, { s: st.s, ui: L });
     set(el.vig, 'opacity', String(st.s.vig));
-    holdLive();
+    if (scrolling) holdLive();
+    waveOn(Math.abs(p - WAVE_P) < 1e-9);
 
     set(el.bg, 'opacity', String(st.hero.dark));
     // Hero ilə üst-üstə düşmə yalnız 3D rejimdədir (hero pin-i bu bölmənin altında qalır)
@@ -229,18 +250,150 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
   const trig = ScrollTrigger.create({
     trigger: root, start: 'top top', end: 'bottom bottom',
     scrub: 0.6, animation: tl, invalidateOnRefresh: true,
-    onToggle: self => root.classList.toggle('is-active', self.isActive),
+    onToggle: setPin, onRefresh: setPin,
   });
+  function setPin(self) {
+    root.classList.toggle('is-active', self.isActive);
+    root.classList.toggle('is-past', !self.isActive && self.progress > 0.5);
+  }
+  setPin(trig);
 
-  // Addım göstəricisi: səhnənin əsas kadrına scroll
-  el.steps.forEach(({ b }, i) => b.addEventListener('click', () => {
-    const y = trig.start + scale.uAt(STEP_KEYS[i]) / scale.total * (trig.end - trig.start);
+  /* ---------- Addım-addım scroll ----------
+     Film zonasında təkər, toxunma və klaviatura səhifəni birbaşa sürüşdürmür: hər jest növbəti dayanacağa
+     (HOLDS, buildScale().stops) aparır, nə qədər güclü scroll edilsə də. Zonanın kənarında (filmin başı, final) adi scroll. */
+  const TOL = 3;
+  const stopsY = () => {
+    const k = (trig.end - trig.start) / scale.total;
+    return scale.stops.map(([a, b]) => [trig.start + a * k, trig.start + b * k]);
+  };
+  // Dayanmaya kənarından bir az içəri gedilir: scroll tam piksələ yuvarlananda kadr dayanmadan əvvələ düşməsin
+  const inside = ([a, b], dir) => (dir > 0 ? a + Math.min(4, (b - a) / 2) : b - Math.min(4, (b - a) / 2));
+  // dir istiqamətində scroll bu mövqedən filmə aiddirmi?
+  function owns(y, dir) {
+    const S = stopsY(), first = S[0], last = S[S.length - 1];
+    return dir > 0 ? y >= first[0] - TOL && y < last[0] - TOL : y > first[1] + TOL && y <= last[1] + TOL;
+  }
+  let busy = false, glideId = 0, restY = 0;
+  function glide(y) {
+    const id = ++glideId;
+    restY = y;
+    const done = () => {
+      if (id !== glideId) return;
+      busy = false;
+      html.style.scrollBehavior = ''; html.style.overflow = '';
+    };
+    const d = Math.abs(y - window.scrollY) / window.innerHeight; // ekran
     html.style.scrollBehavior = 'auto'; // CSS smooth scroll GSAP-ın addımları ilə toqquşur
     gsap.to(window, {
-      scrollTo: y, duration: 0.9, ease: 'power2.inOut', overwrite: true,
-      onComplete: () => { html.style.scrollBehavior = ''; },
-      onInterrupt: () => { html.style.scrollBehavior = ''; },
+      scrollTo: { y, autoKill: false }, duration: Math.min(2.4, Math.max(0.8, 0.3 + 0.9 * d)), ease: 'power1.inOut',
+      overwrite: true, onComplete: done, onInterrupt: done,
     });
+    busy = true;
+  }
+  function step(dir) {
+    const S = stopsY();
+    let y = window.scrollY, next;
+    const i = S.findIndex(([a, b]) => y >= a - TOL && y <= b + TOL);
+    if (i >= 0) {
+      // Dayanmanın içində kadr dəyişmir: əvvəl onun gediş tərəfdəki kənarına keçilir ki, boş scroll vaxt yeməsin
+      const edge = dir > 0 ? S[i][1] : S[i][0];
+      if (Math.abs(edge - y) > 1) {
+        html.style.scrollBehavior = 'auto';
+        window.scrollTo(0, edge);
+        y = edge;
+      }
+      next = i + dir;
+    } else next = dir > 0 ? S.findIndex(([a]) => a > y) : S.findLastIndex(([, b]) => b < y);
+    if (next < 0 || next >= S.length) return false;
+    glide(inside(S[next], dir));
+    return true;
+  }
+  const locked = () => document.body.style.overflow === 'hidden'; // mobil menyu açıqdır
+
+  // Təkər/trackpad: bir jest — bir addım. Jest 200 ms sükutla, istiqamət dəyişməsi və ya yenidən sürətlənmə ilə bitir
+  // (trackpad-ın ətalət dalğası sönən rəqəmlərdir, yeni sürüşdürmə isə birdən böyüyür).
+  // Chrome jestin ilk hadisəsi bloklanmayıbsa (məs. hero-dan gələn jest), qalanlarını bloklamağa icazə vermir:
+  // onda səhifə dayanacaqda əl ilə saxlanılır (pinRest).
+  const g = { t: -1e9, abs: 0, dir: 0, used: false, outside: false };
+  let touchInput = false;
+  const pinRest = () => { if (Math.abs(window.scrollY - restY) > 1) { html.style.scrollBehavior = 'auto'; window.scrollTo(0, restY); html.style.scrollBehavior = ''; } };
+  window.addEventListener('wheel', e => {
+    touchInput = false;
+    if (e.ctrlKey || locked()) return;
+    const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? window.innerHeight : 1);
+    if (!dy || Math.abs(e.deltaX) > Math.abs(dy)) return;
+    const dir = Math.sign(dy), abs = Math.abs(dy);
+    if (e.timeStamp - g.t > 250 || dir !== g.dir || (abs > g.abs * 2.5 && abs > 20)) g.used = g.outside = false;
+    g.t = e.timeStamp; g.abs = abs; g.dir = dir;
+    if (busy) { g.used = true; e.preventDefault(); return; } // animasiya vaxtı başlayan jest də sayılmır
+    if (g.used) { e.preventDefault(); if (!e.cancelable) pinRest(); return; }
+    if (!owns(window.scrollY, dir)) { g.outside = true; return; }
+    e.preventDefault();
+    // aşağıdan gələn jest final kadrına girdi: ilk dayanacaq elə budur
+    const S = stopsY();
+    if (g.outside && dir < 0 && window.scrollY >= S[S.length - 1][0] - TOL) { restY = window.scrollY; g.used = true; return; }
+    g.used = step(dir);
+  }, { passive: false });
+
+  const KEYS = { ArrowDown: 1, PageDown: 1, ' ': 1, ArrowUp: -1, PageUp: -1 };
+  window.addEventListener('keydown', e => {
+    let dir = KEYS[e.key];
+    if (!dir || e.altKey || e.ctrlKey || e.metaKey || locked()) return;
+    if (e.key === ' ' && e.shiftKey) dir = -1;
+    if (e.target.closest?.('input, textarea, select, [contenteditable]') || (e.key === ' ' && e.target.closest?.('a, button, summary'))) return;
+    if (busy) { e.preventDefault(); return; }
+    if (!owns(window.scrollY, dir)) return;
+    e.preventDefault();
+    step(dir);
+  });
+
+  // Toxunma: barmaq zonada sürüşdürəndə səhifə tərpənmir, 24 px-dən sonra bir addım atılır
+  const tch = { y: 0, mode: 0, used: false, on: false };
+  window.addEventListener('touchstart', e => {
+    touchInput = true; tch.on = true; tch.used = false;
+    tch.mode = e.touches.length > 1 || locked() ? -1 : 0;
+    tch.y = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener('touchmove', e => {
+    if (tch.mode < 0 || e.touches.length > 1) return;
+    const dy = tch.y - e.touches[0].clientY;
+    if (!tch.mode) {
+      if (!dy) return;
+      tch.mode = busy || owns(window.scrollY, Math.sign(dy)) ? 1 : -1;
+      if (tch.mode < 0) return;
+    }
+    if (e.cancelable) e.preventDefault();
+    if (!tch.used && !busy && Math.abs(dy) > 24) { step(Math.sign(dy)); tch.used = true; }
+  }, { passive: false });
+  const touchEnd = e => { if (!e.touches.length) tch.on = false; };
+  window.addEventListener('touchend', touchEnd, { passive: true });
+  window.addEventListener('touchcancel', touchEnd, { passive: true });
+
+  // Zonada barmaq ekranda deyil, animasiya da getmir, amma səhifə sürüşür: bu, zonadan kənarda başlamış jestin ətalətidir.
+  // Ətalət kəsilir və hərəkət istiqamətindəki dayanacağa gedilir. Nav linkləri (#anchor) də zonadan keçir: onlara toxunulmur.
+  let lastY = window.scrollY, navJump = false, navTimer = 0;
+  document.addEventListener('click', e => { if (e.target.closest?.('a[href^="#"]')) navJump = true; }, true);
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY, py = lastY;
+    lastY = y;
+    // təkər jesti dayanacağa çatıb, amma bloklanmayan ətalət səhifəni hələ sürüşdürür
+    if (!busy && g.used && !touchInput && performance.now() - g.t < 250) { pinRest(); return; }
+    if (navJump) { clearTimeout(navTimer); navTimer = setTimeout(() => { navJump = false; }, 200); return; }
+    if (!touchInput || busy || tch.on || locked() || Math.abs(y - py) < 1) return;
+    const dir = Math.sign(y - py);
+    if (!owns(y, dir)) return;
+    const S = stopsY();
+    let to;
+    if (S.some(([a, b]) => y >= a - TOL && y <= b + TOL)) to = y; // dayanmanın içindədir: elə burada dayanır
+    else to = dir > 0 ? inside(S.find(([a]) => a > y), 1) : inside(S.findLast(([, b]) => b < y), -1);
+    html.style.overflow = 'hidden'; // iOS ətaləti yalnız belə dayanır; glide bitəndə qaytarılır
+    glide(to);
+  }, { passive: true });
+
+  // Addım göstəricisi: səhnənin əsas kadrına (dayanmanın başına)
+  el.steps.forEach(({ b }, i) => b.addEventListener('click', () => {
+    const j = HOLDS.findIndex(([p]) => p === STEP_KEYS[i]) + 1; // stops[0] filmin başıdır
+    glide(inside(stopsY()[j], 1));
   }));
 
   new IntersectionObserver(([e]) => {
