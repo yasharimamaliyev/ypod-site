@@ -259,21 +259,45 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
   setPin(trig);
 
   /* ---------- Addım-addım scroll ----------
-     Film zonasında təkər, toxunma və klaviatura səhifəni birbaşa sürüşdürmür: hər jest növbəti dayanacağa
-     (HOLDS, buildScale().stops) aparır, nə qədər güclü scroll edilsə də. Zonanın kənarında (filmin başı, final) adi scroll. */
+     Zonada təkər, toxunma və klaviatura səhifəni birbaşa sürüşdürmür: hər jest növbəti dayanacağa aparır,
+     nə qədər güclü scroll edilsə də. Dayanacaqlar: səhifənin başı → hero mətni (3D hero) → film (HOLDS,
+     buildScale().stops) → növbəti bölmə (Brendlər, altında Qiymətlər). Zonadan kənarda adi scroll. */
   const TOL = 3;
-  const stopsY = () => {
-    const k = (trig.end - trig.start) / scale.total;
-    return scale.stops.map(([a, b]) => [trig.start + a * k, trig.start + b * k]);
-  };
+  const heroEl = document.querySelector('.hero');
+  const after = root.nextElementSibling;
+  const HERO_TEXT = 0.75; // hero3d.js timeline-ında mətn və düymələr 0.7-də tam görünür
+  const SAYYAR = [STEP_KEYS[3], STEP_KEYS[4]]; // Reels → həkim kabineti: ən uzun səhnə, ayrıca yavaş
+  const k = () => (trig.end - trig.start) / scale.total;
+  const filmY = () => scale.stops.map(([a, b]) => [trig.start + a * k(), trig.start + b * k()]);
+  const pageY = node => node.getBoundingClientRect().top + window.scrollY;
+  function stopsY() {
+    const S = filmY();
+    // 3D hero scroll ilə açılır: onun iki kadrı da addımdır; filmin başı (= hero-nun sonu) onda ayrıca addım deyil
+    if (heroEl && html.classList.contains('is-3d-ready')) {
+      const h0 = Math.max(0, pageY(heroEl)), ht = h0 + HERO_TEXT * (trig.start - h0);
+      S.splice(0, 1, [0, 0], [ht, ht]);
+    }
+    if (after) { const y = pageY(after) - (parseFloat(getComputedStyle(html).scrollPaddingTop) || 0); S.push([y, y]); }
+    return S;
+  }
   // Dayanmaya kənarından bir az içəri gedilir: scroll tam piksələ yuvarlananda kadr dayanmadan əvvələ düşməsin
   const inside = ([a, b], dir) => (dir > 0 ? a + Math.min(4, (b - a) / 2) : b - Math.min(4, (b - a) / 2));
-  // dir istiqamətində scroll bu mövqedən filmə aiddirmi?
+  const within = (S, y) => S.some(([a, b]) => y >= a - TOL && y <= b + TOL);
+  // dir istiqamətində scroll bu mövqedən zonaya aiddirmi?
   function owns(y, dir) {
     const S = stopsY(), first = S[0], last = S[S.length - 1];
     return dir > 0 ? y >= first[0] - TOL && y < last[0] - TOL : y > first[1] + TOL && y <= last[1] + TOL;
   }
-  let busy = false, glideId = 0, restY = 0;
+  // Addımın müddəti: film səhnələri p fərqinə görə 1.2–2.4 s, Səyyar 4 s, hero və bölmədən çıxış 1.8 s
+  const pOf = y => scale.pAt(Math.min(scale.total, Math.max(0, (y - trig.start) / k())));
+  function duration(from, to) {
+    const lo = Math.min(from, to), hi = Math.max(from, to);
+    if (lo < trig.start - TOL || hi > trig.end + TOL) return 1.8;
+    const a = pOf(lo), b = pOf(hi);
+    if (a <= SAYYAR[0] + 1e-6 && b >= SAYYAR[1] - 1e-6) return 4;
+    return Math.min(2.4, Math.max(1.2, 0.9 + 9 * (b - a)));
+  }
+  let busy = false, glideId = 0, restY = 0, queued = 0;
   function glide(y) {
     const id = ++glideId;
     restY = y;
@@ -281,11 +305,14 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
       if (id !== glideId) return;
       busy = false;
       html.style.scrollBehavior = ''; html.style.overflow = '';
+      // animasiya vaxtı başlanmış yeni jest itmir: indi icra olunur
+      const q = queued;
+      queued = 0;
+      if (q && owns(window.scrollY, q)) step(q);
     };
-    const d = Math.abs(y - window.scrollY) / window.innerHeight; // ekran
     html.style.scrollBehavior = 'auto'; // CSS smooth scroll GSAP-ın addımları ilə toqquşur
     gsap.to(window, {
-      scrollTo: { y, autoKill: false }, duration: Math.min(2.4, Math.max(0.8, 0.3 + 0.9 * d)), ease: 'power1.inOut',
+      scrollTo: { y, autoKill: false }, duration: duration(window.scrollY, y), ease: 'sine.inOut',
       overwrite: true, onComplete: done, onInterrupt: done,
     });
     busy = true;
@@ -310,11 +337,11 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
   }
   const locked = () => document.body.style.overflow === 'hidden'; // mobil menyu açıqdır
 
-  // Təkər/trackpad: bir jest — bir addım. Jest 200 ms sükutla, istiqamət dəyişməsi və ya yenidən sürətlənmə ilə bitir
-  // (trackpad-ın ətalət dalğası sönən rəqəmlərdir, yeni sürüşdürmə isə birdən böyüyür).
-  // Chrome jestin ilk hadisəsi bloklanmayıbsa (məs. hero-dan gələn jest), qalanlarını bloklamağa icazə vermir:
+  // Təkər/trackpad: bir jest — bir addım. Yeni jest: 250 ms sükut, istiqamət dəyişməsi, ya da sönən ətalətdən sonra
+  // birdən sürətlənmə (trackpad-ın ətalət dalğası sönən rəqəmlərdir, yeni sürüşdürmə isə birdən böyüyür).
+  // Chrome jestin ilk hadisəsi bloklanmayıbsa (məs. zonadan kənarda başlayan jest), qalanlarını bloklamağa icazə vermir:
   // onda səhifə dayanacaqda əl ilə saxlanılır (pinRest).
-  const g = { t: -1e9, abs: 0, dir: 0, used: false, outside: false };
+  const g = { t: -1e9, dir: 0, peak: 0, low: 0, used: false, outside: false };
   let touchInput = false;
   const pinRest = () => { if (Math.abs(window.scrollY - restY) > 1) { html.style.scrollBehavior = 'auto'; window.scrollTo(0, restY); html.style.scrollBehavior = ''; } };
   window.addEventListener('wheel', e => {
@@ -323,15 +350,18 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
     const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? window.innerHeight : 1);
     if (!dy || Math.abs(e.deltaX) > Math.abs(dy)) return;
     const dir = Math.sign(dy), abs = Math.abs(dy);
-    if (e.timeStamp - g.t > 250 || dir !== g.dir || (abs > g.abs * 2.5 && abs > 20)) g.used = g.outside = false;
-    g.t = e.timeStamp; g.abs = abs; g.dir = dir;
-    if (busy) { g.used = true; e.preventDefault(); return; } // animasiya vaxtı başlayan jest də sayılmır
+    const fresh = e.timeStamp - g.t > 250 || dir !== g.dir || (abs > 20 && g.low < g.peak * 0.35 && abs > g.low * 3);
+    if (fresh || abs > g.peak) g.peak = g.low = abs;
+    else g.low = Math.min(g.low, abs);
+    if (fresh) g.used = g.outside = false;
+    g.t = e.timeStamp; g.dir = dir;
+    if (busy) { e.preventDefault(); if (fresh) queued = dir; g.used = true; return; }
     if (g.used) { e.preventDefault(); if (!e.cancelable) pinRest(); return; }
-    if (!owns(window.scrollY, dir)) { g.outside = true; return; }
+    const y = window.scrollY;
+    if (!owns(y, dir)) { g.outside = true; return; }
     e.preventDefault();
-    // aşağıdan gələn jest final kadrına girdi: ilk dayanacaq elə budur
-    const S = stopsY();
-    if (g.outside && dir < 0 && window.scrollY >= S[S.length - 1][0] - TOL) { restY = window.scrollY; g.used = true; return; }
+    // kənardan gələn jest dayanmanın içinə düşdü (məs. aşağıdan final kadrına): ilk dayanacaq elə budur
+    if (g.outside && within(stopsY(), y)) { restY = y; g.used = true; return; }
     g.used = step(dir);
   }, { passive: false });
 
@@ -341,7 +371,7 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
     if (!dir || e.altKey || e.ctrlKey || e.metaKey || locked()) return;
     if (e.key === ' ' && e.shiftKey) dir = -1;
     if (e.target.closest?.('input, textarea, select, [contenteditable]') || (e.key === ' ' && e.target.closest?.('a, button, summary'))) return;
-    if (busy) { e.preventDefault(); return; }
+    if (busy) { e.preventDefault(); if (!e.repeat) queued = dir; return; }
     if (!owns(window.scrollY, dir)) return;
     e.preventDefault();
     step(dir);
@@ -363,7 +393,10 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
       if (tch.mode < 0) return;
     }
     if (e.cancelable) e.preventDefault();
-    if (!tch.used && !busy && Math.abs(dy) > 24) { step(Math.sign(dy)); tch.used = true; }
+    if (!tch.used && Math.abs(dy) > 24) {
+      tch.used = true;
+      if (busy) queued = Math.sign(dy); else step(Math.sign(dy));
+    }
   }, { passive: false });
   const touchEnd = e => { if (!e.touches.length) tch.on = false; };
   window.addEventListener('touchend', touchEnd, { passive: true });
@@ -384,7 +417,7 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
     if (!owns(y, dir)) return;
     const S = stopsY();
     let to;
-    if (S.some(([a, b]) => y >= a - TOL && y <= b + TOL)) to = y; // dayanmanın içindədir: elə burada dayanır
+    if (within(S, y)) to = y; // dayanmanın içindədir: elə burada dayanır
     else to = dir > 0 ? inside(S.find(([a]) => a > y), 1) : inside(S.findLast(([, b]) => b < y), -1);
     html.style.overflow = 'hidden'; // iOS ətaləti yalnız belə dayanır; glide bitəndə qaytarılır
     glide(to);
@@ -392,8 +425,8 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
 
   // Addım göstəricisi: səhnənin əsas kadrına (dayanmanın başına)
   el.steps.forEach(({ b }, i) => b.addEventListener('click', () => {
-    const j = HOLDS.findIndex(([p]) => p === STEP_KEYS[i]) + 1; // stops[0] filmin başıdır
-    glide(inside(stopsY()[j], 1));
+    const j = HOLDS.findIndex(([p]) => p === STEP_KEYS[i]) + 1; // filmY()[0] filmin başıdır
+    glide(inside(filmY()[j], 1));
   }));
 
   new IntersectionObserver(([e]) => {
