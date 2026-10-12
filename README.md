@@ -23,6 +23,7 @@ npm run preview    # dist/-i lokal göstərir
 | Telefon, koordinat, Instagram endpoint, GLB yolu | `src/js/config.js` |
 | Qiymətlər | `src/js/pricing.js` (+ `tests/pricing.test.mjs`) |
 | Rənglər, ölçülər | `src/styles/tokens.css` |
+| Şriftlər (saytın özündə) | `src/styles/fonts.css`, `src/assets/fonts/` |
 | 3D mikrofon modeli | `src/js/mic-model.js` |
 | Scroll animasiyası (hero) | `src/js/hero3d.js` |
 | Xidmətlər filmi: açar kadrlar | `src/js/services-stage.js` (dizayn prototipinin birə-bir köçürməsi) |
@@ -35,10 +36,27 @@ Qiymət dəyişəndə üç yer yenilənir: `src/js/pricing.js`, testdəki gözl�
 
 ## 3D hero necə işləyir
 
-- İlk ekranda statik mikrofon şəkli (`src/assets/mic-hero.webp`) görünür. Bu şəkil 3D-nin ilk kadrından çəkilib, ona görə 3D gələndə keçid görünmür. Three.js və GSAP ilk toxunuş və ya scroll-da yüklənir.
+- İlk ekranda statik mikrofon şəkli (`src/assets/mic-hero.webp`) görünür. Bu şəkil 3D-nin ilk kadrından çəkilib, ona görə 3D gələndə keçid görünmür. Three.js və GSAP ilk toxunuş və ya scroll-da işə düşür. Fayllarını isə səhifə yüklənib sakitləşəndə əvvəlcədən endirir (`modulepreload`, işə salmır): siyahını build `<meta name="ypod-lazy">`-ə yazır (`vite.config.js` → `lazyChunks`), `main.js` → `preloadLazy` oxuyur. 3D faylı yalnız 3D-li cihazda, `saveData`-da heç nə endirilmir.
 - Mikrofonun modeli və ya işığı dəyişəndə şəkli yenidən çək: `scripts/capture-mic.mjs` (istifadə qaydası faylın başındadır).
 - 3D bu hallarda söndürülür və statik hero qalır: `prefers-reduced-motion`, WebGL olmaması, zəif telefon (`hardwareConcurrency ≤ 4`, toxunma ekranı). iPhone/iPad istisnadır: Safari orada nüvə sayını gizlədib 2–4 qaytarır.
 - Hazır GLB modeli gələndə onu `public/models/mic.glb`-yə qoy və `config.js`-də `micModelUrl: 'models/mic.glb'` yaz. Model Draco ilə sıxılmalı və ≤ 1.5 MB olmalıdır.
+
+## Şriftlər
+
+Unbounded (yalnız 900) və Manrope (400–800, variable) Google Fonts-dan deyil, saytın özündən gəlir: iki əlavə server bağlantısı yoxdur, fayllar kiçikdir (AZ/EN səhifəsi ~54 KB, RU ~78 KB; əvvəl ~204 KB). Hər şrift latın (+AZ hərfləri, ₼, oxlar) və kiril hissəsinə bölünüb, brauzer `unicode-range`-ə görə yalnız lazım olanı endirir. Latın hissələri `template.html`-də `preload` olunur.
+
+Fayllar Google Fonts reposundakı variable TTF-lərdən kəsilib (`pip install fonttools brotli`):
+
+```bash
+fonttools varLib.instancer 'Unbounded[wght].ttf' wght=900 -o U900.ttf
+fonttools varLib.instancer 'Manrope[wght].ttf' wght=400:800 -o M.ttf
+LAT="U+0020-007E,U+00A0-00FF,U+0100-017F,U+018F,U+0259,U+2010-2027,U+2030-203A,U+20AC,U+20BC,U+2122,U+2190-2199,U+2212,U+2248,U+2260,U+2264-2265,U+2713"
+pyftsubset U900.ttf --unicodes="$LAT" --flavor=woff2 --no-hinting --output-file=unbounded-900-lat.woff2
+pyftsubset U900.ttf --unicodes="U+0400-045F,U+2116" --flavor=woff2 --no-hinting --output-file=unbounded-900-cyr.woff2
+# Manrope üçün eyni iki əmr (M.ttf → manrope-lat / manrope-cyr)
+```
+
+Başlıqda Unbounded-in başqa qalınlığı lazım olsa, faylı yenidən kəs (indiki faylda yalnız 900 var). Manrope-da böyük `Ə` yoxdur (Google versiyasında da yox idi), ehtiyat şriftlə çəkilir.
 
 ## Xidmətlər filmi necə işləyir
 

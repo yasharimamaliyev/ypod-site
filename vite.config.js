@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import { resolve } from 'node:path';
+import { resolve, relative } from 'node:path';
 import { renderPages } from './scripts/render-pages.mjs';
 
 // Template və tərcümələr dəyişəndə 3 dil səhifəsini yenidən yaradır
@@ -20,12 +20,47 @@ function i18nPages() {
   };
 }
 
+// Animasiya chunk-larının yollarını HTML-ə yazır (<meta name="ypod-lazy">): main.js onları boş vaxtda əvvəlcədən endirir.
+// "3d:" ilə başlayanlar yalnız 3D-li cihazda lazımdır. Yollar səhifəyə nisbidir (en/, ru/ → ../assets/...).
+function lazyChunks() {
+  const groups = [
+    ['3d', ['/src/js/hero3d.js']],
+    ['', ['/src/js/services.js', '/gsap/index.js', '/gsap/ScrollTrigger.js', '/gsap/ScrollToPlugin.js']],
+  ];
+  return {
+    name: 'ypod-lazy-chunks',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, { bundle, filename }) {
+        if (!bundle) return html;
+        const chunks = Object.values(bundle).filter(c => c.type === 'chunk');
+        const seen = new Set();
+        const out = [];
+        const add = (prefix, c) => {
+          if (!c || c.isEntry || seen.has(c.fileName)) return;
+          seen.add(c.fileName);
+          c.imports.forEach(f => add(prefix, bundle[f]));
+          out.push(prefix + c.fileName);
+        };
+        // Ümumi chunk-lar əvvəl: 3D-nin asılılıqları (gsap) "3d:" kimi işarələnməsin
+        for (const [tag, ids] of [...groups].reverse()) {
+          for (const id of ids) add(tag ? tag + ':' : '', chunks.find(c => c.facadeModuleId?.endsWith(id)));
+        }
+        const up = '../'.repeat(relative(resolve('src'), filename).split('/').length - 1);
+        const content = out.map(f => f.replace(/^(3d:)?/, `$1${up}`)).join(' ');
+        return [{ tag: 'meta', attrs: { name: 'ypod-lazy', content }, injectTo: 'head' }];
+      },
+    },
+  };
+}
+
 export default defineConfig({
   root: 'src',
   publicDir: resolve('public'),
   // Nisbi yollar: sayt həm github.io/<repo>/ altında, həm də öz domenində işləsin
   base: './',
-  plugins: [i18nPages()],
+  plugins: [i18nPages(), lazyChunks()],
   build: {
     outDir: resolve('dist'),
     emptyOutDir: true,

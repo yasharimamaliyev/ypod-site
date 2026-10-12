@@ -184,8 +184,29 @@ async function enhance() {
 
 // 3D ağır işdir: ilk toxunuş/scroll/siçan hərəkətinə qədər gözləyir. Statik şəkil ilk 3D kadrla eyni pozadadır.
 const START_EVENTS = ['pointermove', 'pointerdown', 'touchstart', 'wheel', 'scroll', 'keydown'];
+let started = false;
 function startOnce() {
+  started = true;
   START_EVENTS.forEach(ev => removeEventListener(ev, startOnce, { capture: true }));
   enhance();
 }
 START_EVENTS.forEach(ev => addEventListener(ev, startOnce, { capture: true, passive: true, once: true }));
+
+// Səhifə yüklənib sakitləşəndə animasiya fayllarını əvvəlcədən endirir (işə salmır): ilk toxunuşda 3D gözlətmir.
+// Fayl siyahısını build yazır (vite.config.js → ypod-lazy); dev-də meta yoxdur. Trafik qənaəti rejimində endirilmir.
+function preloadLazy() {
+  const list = document.querySelector('meta[name="ypod-lazy"]')?.content.split(' ').filter(Boolean);
+  if (!list || started || reducedMotion || navigator.connection?.saveData) return;
+  const anim = root.classList.contains('svc-anim'), d3 = root.classList.contains('can-3d');
+  for (const item of list) {
+    const is3d = item.startsWith('3d:');
+    if (is3d ? !d3 : !(anim || d3)) continue;
+    const l = document.createElement('link');
+    l.rel = 'modulepreload';
+    l.href = is3d ? item.slice(3) : item;
+    document.head.append(l);
+  }
+}
+const idle = cb => (window.requestIdleCallback ? requestIdleCallback(cb, { timeout: 3000 }) : setTimeout(cb, 1200));
+if (document.readyState === 'complete') idle(preloadLazy);
+else addEventListener('load', () => idle(preloadLazy), { once: true });

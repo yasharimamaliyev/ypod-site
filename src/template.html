@@ -17,12 +17,9 @@
   <meta property="og:locale" content="{{locale}}">
   <!-- TODO: [OG ŞƏKLİ] 1200×630 hazır olanda: <meta property="og:image" content="..."> -->
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Şrift CSS-i səhifənin göstərilməsini bloklamır (display=swap) -->
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@700;900&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@700;900&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@700;900&display=swap"></noscript>
+  <!-- Şriftlər saytın özündədir (styles/fonts.css). Latın hissəsi hər dildə ilk ekranda lazımdır -->
+  <link rel="preload" as="font" type="font/woff2" href="{{ROOT}}assets/fonts/unbounded-900-lat.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="{{ROOT}}assets/fonts/manrope-lat.woff2" crossorigin>
   <link rel="stylesheet" href="{{ROOT}}styles/main.css">
 
   <script>

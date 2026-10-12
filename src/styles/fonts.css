@@ -1,0 +1,24 @@
+/* Şriftlər saytın özündədir (Google Fonts yox): az bağlantı, kiçik fayl.
+   Fayllar Google Fonts-un variable TTF-lərindən kəsilib (fonttools):
+   Unbounded yalnız 900, Manrope 400–800; hər biri latın (+AZ) və kiril hissəsinə bölünüb.
+   Brauzer unicode-range-ə görə yalnız səhifədə lazım olan hissəni yükləyir. */
+@font-face {
+  font-family: 'Unbounded'; font-style: normal; font-weight: 900; font-display: swap;
+  src: url('../assets/fonts/unbounded-900-lat.woff2') format('woff2');
+  unicode-range: U+0020-007E, U+00A0-00FF, U+0100-017F, U+018F, U+0259, U+2010-2027, U+2030-203A, U+20AC, U+20BC, U+2122, U+2190-2199, U+2212, U+2248, U+2260, U+2264-2265, U+2713;
+}
+@font-face {
+  font-family: 'Unbounded'; font-style: normal; font-weight: 900; font-display: swap;
+  src: url('../assets/fonts/unbounded-900-cyr.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+2116;
+}
+@font-face {
+  font-family: 'Manrope'; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url('../assets/fonts/manrope-lat.woff2') format('woff2');
+  unicode-range: U+0020-007E, U+00A0-00FF, U+0100-017F, U+018F, U+0259, U+2010-2027, U+2030-203A, U+20AC, U+20BC, U+2122, U+2190-2199, U+2212, U+2248, U+2260, U+2264-2265, U+2713;
+}
+@font-face {
+  font-family: 'Manrope'; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url('../assets/fonts/manrope-cyr.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+2116;
+}
