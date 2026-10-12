@@ -141,6 +141,7 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
 
   // Həkimin əl etməsi (S5b dayanması): zamana bağlıdır, çünki dayanmada scroll, deməli p da dayanır
   const WAVE_P = STEP_KEYS[4];
+  const STEP0_P = HOLDS[0][0]; // S0 "Siz danışın"
   const W = { a: 0, ph: 0 };
   let waveTl = null, waveCall = null;
   function waveOn(on) {
@@ -165,16 +166,19 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
   function render(scrolling = true) {
     const p = scale.pAt(state.q * scale.total);
     const st = computeStage(p, L, info, W.a * 16 * Math.sin(W.ph));
+    // Hero ilə üst-üstə düşmə yalnız 3D rejimdədir (hero pin-i bu bölmənin altında qalır).
+    // 3D-siz filmin başı boş qaranlıq kadrdır (hero-nun üstünə gəlmək üçündür): onda bölmə S0 kadrı ilə girir.
+    const over = html.classList.contains('is-3d-ready');
+    if (!over && p < STEP0_P) { st.intro = { o: 1, y: 0, b: 0 }; st.hero.dark = 1; }
     // Hero-dan keçid: vinyet də qaranlıqla birlikdə gəlir ki, hero-nun üstündə kənar qaralması görünməsin
-    st.s.vig = Math.round(st.s.vig * Math.min(1, p / 0.026) * 100) / 100;
+    if (over) st.s.vig = Math.round(st.s.vig * Math.min(1, p / 0.026) * 100) / 100;
     applyBindings(bindings, { s: st.s, ui: L });
     set(el.vig, 'opacity', String(st.s.vig));
     if (scrolling) holdLive();
     waveOn(Math.abs(p - WAVE_P) < 1e-9);
 
     set(el.bg, 'opacity', String(st.hero.dark));
-    // Hero ilə üst-üstə düşmə yalnız 3D rejimdədir (hero pin-i bu bölmənin altında qalır)
-    if (el.heroGrid && html.classList.contains('is-3d-ready')) {
+    if (el.heroGrid && over) {
       set(el.heroGrid, 'opacity', String(st.hero.text));
       set(el.heroGrid, 'transform', st.hero.y ? `translate3d(0,${st.hero.y}px,0)` : 'none');
       hero?.setRingIntensity(st.hero.ring);
@@ -261,23 +265,24 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
   /* ---------- Addım-addım scroll ----------
      Zonada təkər, toxunma və klaviatura səhifəni birbaşa sürüşdürmür: hər jest növbəti dayanacağa aparır,
      nə qədər güclü scroll edilsə də. Dayanacaqlar: səhifənin başı → hero mətni (3D hero) → film (HOLDS,
-     buildScale().stops) → növbəti bölmə (Brendlər, altında Qiymətlər). Zonadan kənarda adi scroll. */
+     buildScale().stops). Final kadrından sonra (Brendlər, Qiymətlər) adi scroll. */
   const TOL = 3;
   const heroEl = document.querySelector('.hero');
-  const after = root.nextElementSibling;
   const HERO_TEXT = 0.75; // hero3d.js timeline-ında mətn və düymələr 0.7-də tam görünür
-  const SAYYAR = [STEP_KEYS[3], STEP_KEYS[4]]; // Reels → həkim kabineti: ən uzun səhnə, ayrıca yavaş
+  // Ayrıca yavaş keçidlər (p-dən p-yə, saniyə): S0 → S1, Səyyar (Reels → həkim kabineti), həkim → montaj
+  const SLOW = [[HOLDS[0][0], STEP_KEYS[0], 3], [STEP_KEYS[3], STEP_KEYS[4], 5], [STEP_KEYS[4], STEP_KEYS[5], 3.5]];
   const k = () => (trig.end - trig.start) / scale.total;
   const filmY = () => scale.stops.map(([a, b]) => [trig.start + a * k(), trig.start + b * k()]);
   const pageY = node => node.getBoundingClientRect().top + window.scrollY;
+  const is3d = () => Boolean(heroEl) && html.classList.contains('is-3d-ready');
   function stopsY() {
     const S = filmY();
-    // 3D hero scroll ilə açılır: onun iki kadrı da addımdır; filmin başı (= hero-nun sonu) onda ayrıca addım deyil
-    if (heroEl && html.classList.contains('is-3d-ready')) {
+    // 3D hero scroll ilə açılır: onun iki kadrı da addımdır; filmin başı (= hero-nun sonu) onda ayrıca addım deyil.
+    // 3D-siz filmin başı S0 kadrıdır (render → "Siz danışın" artıq görünür): başdan S0-ın sonuna qədər bir dayanacaq.
+    if (is3d()) {
       const h0 = Math.max(0, pageY(heroEl)), ht = h0 + HERO_TEXT * (trig.start - h0);
       S.splice(0, 1, [0, 0], [ht, ht]);
-    }
-    if (after) { const y = pageY(after) - (parseFloat(getComputedStyle(html).scrollPaddingTop) || 0); S.push([y, y]); }
+    } else S.splice(0, 2, [S[0][0], S[1][1]]);
     return S;
   }
   // Dayanmaya kənarından bir az içəri gedilir: scroll tam piksələ yuvarlananda kadr dayanmadan əvvələ düşməsin
@@ -288,14 +293,15 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
     const S = stopsY(), first = S[0], last = S[S.length - 1];
     return dir > 0 ? y >= first[0] - TOL && y < last[0] - TOL : y > first[1] + TOL && y <= last[1] + TOL;
   }
-  // Addımın müddəti: film səhnələri p fərqinə görə 1.2–2.4 s, Səyyar 4 s, hero və bölmədən çıxış 1.8 s
+  // Addımın müddəti: film səhnələri p fərqinə görə 1.2–2.4 s, SLOW keçidləri öz vaxtı ilə, hero 1.8 s
   const pOf = y => scale.pAt(Math.min(scale.total, Math.max(0, (y - trig.start) / k())));
   function duration(from, to) {
     const lo = Math.min(from, to), hi = Math.max(from, to);
-    if (lo < trig.start - TOL || hi > trig.end + TOL) return 1.8;
+    if (lo < trig.start - TOL) return 1.8;
     const a = pOf(lo), b = pOf(hi);
-    if (a <= SAYYAR[0] + 1e-6 && b >= SAYYAR[1] - 1e-6) return 4;
-    return Math.min(2.4, Math.max(1.2, 0.9 + 9 * (b - a)));
+    let d = Math.min(2.4, Math.max(1.2, 0.9 + 9 * (b - a)));
+    for (const [x, y, t] of SLOW) if (a <= x + 1e-6 && b >= y - 1e-6) d = Math.max(d, t);
+    return d;
   }
   let busy = false, glideId = 0, restY = 0, queued = 0;
   function glide(y) {
@@ -335,7 +341,7 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
     glide(inside(S[next], dir));
     return true;
   }
-  const locked = () => document.body.style.overflow === 'hidden'; // mobil menyu açıqdır
+  const locked = () => html.classList.contains('menu-open'); // mobil menyu açıqdır (nav.js)
 
   // Təkər/trackpad: bir jest — bir addım. Yeni jest: 250 ms sükut, istiqamət dəyişməsi, ya da sönən ətalətdən sonra
   // birdən sürətlənmə (trackpad-ın ətalət dalğası sönən rəqəmlərdir, yeni sürüşdürmə isə birdən böyüyür).

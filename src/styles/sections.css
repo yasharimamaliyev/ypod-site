@@ -21,7 +21,8 @@
   .menu-btn { display: none; }
 }
 
-/* Mobil menyu: tam ekran overlay */
+/* Mobil menyu: tam ekran overlay; açıq olanda səhifə dayanır (nav.js) */
+html.menu-open { overflow: hidden; }
 .mmenu {
   position: fixed; inset: var(--nav-h) 0 0 0; z-index: 49;
   display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
@@ -207,7 +208,7 @@
 /* ---- Xidmətlər: scroll filmi ---- */
 /* Hündürlük = ekran + scroll məsafəsi. Məsafə services-stage.js-dəki buildScale().total-dır (dizayn 600/700vh + dayanmalar);
    rəqəm dəyişəndə burada da dəyiş (tests/services.test.mjs yoxlayır). */
-.svc-anim .svc { height: 1052.2vh; height: 1052.2svh; padding: 0; overflow-x: clip; }
+.svc-anim .svc { height: 1043.4vh; height: 1043.4svh; padding: 0; overflow-x: clip; }
 /* Nav linki S0-ın dayanmasının başına (p 4% = 0.24 ekran) aparır */
 .svc-anim .svc { scroll-margin-top: calc(-1 * var(--nav-h) - 24vh); scroll-margin-top: calc(-1 * var(--nav-h) - 24svh); }
 /* 3D hero: bölmə hero-nun son ekranının üstündən başlayır (BRIEF bölmə 10). Keçidin ilk 3%-ində (--hero-tail)
@@ -284,7 +285,7 @@
 .svc-anim .svc.is-active .svc-txt, .svc-anim .svc.is-active .svc-chip { will-change: transform, opacity; }
 
 @media (min-width: 1024px) {
-  .svc-anim .svc { height: 1155.9vh; height: 1155.9svh; scroll-margin-top: calc(-1 * var(--nav-h) - 28vh); scroll-margin-top: calc(-1 * var(--nav-h) - 28svh); }
+  .svc-anim .svc { height: 1149.8vh; height: 1149.8svh; scroll-margin-top: calc(-1 * var(--nav-h) - 28vh); scroll-margin-top: calc(-1 * var(--nav-h) - 28svh); }
   .svc-anim.can-3d { --hero-tail: 21vh; --hero-tail: 21svh; }
   .svc-anim.can-3d .hero { height: calc(250vh + var(--hero-tail)); }
   .svc-anim .svc-shade { display: block; position: absolute; top: var(--nav-h); bottom: 0; opacity: 0; }
@@ -332,6 +333,7 @@
 
 /* ---- Qiymətlər ---- */
 .seg-row { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 32px; }
+.seg-rows { display: flex; flex-direction: column; }
 .seg-label { font-size: 13px; font-weight: 700; color: rgba(253, 246, 255, .6); }
 .price-grid { display: grid; gap: 16px; }
 .price-card { padding: 28px 24px; gap: 22px; }
@@ -347,7 +349,8 @@
 .price-num.swap { animation: priceSwap .2s var(--ease-out); }
 @keyframes priceSwap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-.reels-pack { margin-top: 16px; padding: 28px 24px; display: grid; gap: 28px; }
+/* Mobildə Reels paketi qiymət kartlarının davamı kimi görünməsin: böyük aralıq və bənövşəyi çərçivə */
+.reels-pack { margin-top: 56px; padding: 28px 24px; display: grid; gap: 28px; border-color: rgba(168, 85, 247, .4); }
 .reels-pack-info { display: flex; flex-direction: column; gap: 18px; }
 .h3-reels { font-size: 24px; line-height: 1.12; }
 .reels-pack-buy { display: flex; flex-direction: column; align-items: stretch; gap: 20px; padding-top: 24px; border-top: 1px solid rgba(253, 246, 255, .1); }
@@ -367,7 +370,8 @@
   .price-num-lg { font-size: 64px; }
   .price-cur { font-size: 20px; }
   .price-unit { font-size: 15px; }
-  .reels-pack { margin-top: 48px; padding: 48px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; align-items: center; }
+  .seg-rows { flex-direction: row; justify-content: center; gap: 56px; }
+  .reels-pack { margin-top: 48px; padding: 48px; border-color: var(--c-line); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; align-items: center; }
   .reels-pack-info { gap: 22px; }
   .h3-reels { font-size: 36px; line-height: 1.1; }
   .reels-pack-buy { padding: 0 0 0 40px; border-top: 0; border-left: 1px solid rgba(253, 246, 255, .1); gap: 24px; }
@@ -476,6 +480,5 @@ a.kv-v:hover { color: var(--c-fuchsia-500); }
 .foot-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
 .logo-foot { min-height: 0; font-size: 18px; }
 .foot-copy { font-size: 14px; }
-.foot-links { display: flex; gap: 24px; }
 @media (max-width: 767px) { .foot-in { flex-direction: column; align-items: flex-start; } }
 @media (min-width: 1024px) { .foot { padding: 36px 0; } }

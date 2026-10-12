@@ -3,8 +3,8 @@
   "lang": "az",
   "locale": "az_AZ",
   "meta": {
-    "title": "Y Pod — podcast və video studiyası, Bakı",
-    "description": "Siz danışın. Çəkiliş, montaj və təhvil bizdən. Y Pod Bakıda tam xidmətli podcast və video studiyasıdır."
+    "title": "Y Pod — podkast və video studiyası, Bakı",
+    "description": "Siz danışın. Çəkiliş, montaj və təhvil bizdən. Y Pod Bakıda tam xidmətli podkast və video studiyasıdır."
   },
   "nav": {
     "home_aria": "Y Pod ana səhifə",
@@ -22,28 +22,27 @@
   },
   "hero": {
     "aria": "Giriş",
-    "pill": "Podcast və video studiyası · Bakı",
-    "h1_lead": "Y Pod studiyasına",
+    "pill": "Podkast və video studiyası · Bakı",
+    "h1_lead": "Y\u00a0Pod studiyasına",
     "h1_mark": "xoş gəlmisiniz!",
     "sub": "Siz danışın. Çəkiliş, montaj və təhvil bizdən.",
     "cta": "Çəkilişə yazılın",
     "prices": "Qiymətlər"
   },
   "services": {
-    "eyebrow": "Xidmətlər",
-    "title": "Siz danışın, qalanını biz edək",
-    "s1_eb": "01 · Podcast çəkilişi",
+    "title": "Siz danışın, qalanını biz həll edərik",
+    "s1_eb": "01 · Podkast çəkilişi",
     "s1_h": "1 kameralı çəkiliş",
     "s1_sub": "Operator, işıq və səs qurulumu daxildir.",
     "s1_chip": "1 saat ·",
     "s1_num": "70",
-    "s2_eb": "02 · Podcast çəkilişi",
+    "s2_eb": "02 · Podkast çəkilişi",
     "s2_h": "2 kameralı çəkiliş",
     "s2_sub": "İki danışan, iki bucaq.",
     "s2_chip": "1 saat ·",
     "s2_num": "120",
-    "s3_eb": "03 · Podcast çəkilişi",
-    "s3_h": "3 nəfərlik setup",
+    "s3_eb": "03 · Podkast çəkilişi",
+    "s3_h": "3 kameralı çəkiliş",
     "s3_sub": "Qonaqlı söhbət və panel üçün üç kamera.",
     "s3_chip": "3 kamera · 1 saat ·",
     "s3_num": "170",
@@ -57,16 +56,16 @@
     "s5_sub": "Komanda avadanlıqla ofisinizə, klinikanıza və ya təyin etdiyiniz məkana gəlir.",
     "s5_chip": "Sizin məkanda · Reels Paketi ·",
     "s5_num": "250",
-    "s6_eb": "06 · Podcast montajı",
+    "s6_eb": "06 · Podkast montajı",
     "s6_h": "Kəsim, səs təmizləmə, final export",
     "s6_sub": "Vaxtında və sabit müddətdə təhvil.",
     "s6_chip": "1 saatlıq epizod ·",
     "s6_num": "100",
-    "s5_note": "Podcast çəkilişi 140 AZN-dən (1 saat)",
+    "s5_note": "Podkast çəkilişi 140 AZN-dən (1 saat)",
     "steps_aria": "Xidmət addımları",
     "step_1": "1 kamera",
     "step_2": "2 kamera",
-    "step_3": "3 nəfər",
+    "step_3": "3 kamera",
     "step_4": "Reels",
     "step_5": "Səyyar",
     "step_6": "Montaj",
@@ -79,7 +78,7 @@
   "message": {
     "a": "Montaj",
     "b": "gecikmir",
-    "text": "Bazarda ən çox şikayət edilən problem montajın gecikməsidir. Bizdə təhvil vaxtı çəkilişdən əvvəl bilinir və sabitdir."
+    "text": "Bazarda ən çox şikayət edilən problem montajın gecikməsidir. Bizdə təhvil vaxtı çəkilişdən əvvəl bilinir və sabitdir. Podkast 7 iş günü, Reels çəkilişi isə 3 iş günü ərzində təhvil verilir."
   },
   "brands": {
     "title": "Bizə etibar edən brendlər"
@@ -105,7 +104,7 @@
     "studio_i2": "Operator",
     "studio_i3": "İşıq və səs qurulumu",
     "studio_unit": "1 saat",
-    "edit_title": "Podcast montajı",
+    "edit_title": "Podkast montajı",
     "edit_i1": "Peşəkar kəsim",
     "edit_i2": "Səs təmizləmə",
     "edit_i3": "Final export",

@@ -7,7 +7,9 @@ export function initNav() {
     menu.hidden = !open;
     btn.setAttribute('aria-expanded', String(open));
     btn.setAttribute('aria-label', open ? btn.dataset.labelClose : btn.dataset.labelOpen);
-    document.body.style.overflow = open ? 'hidden' : '';
+    // Scroll <html>-də dayandırılır: body-yə overflow verəndə o, ayrıca scroll qutusu olur və sticky nav
+    // səhifənin ən başına qayıdırdı (aşağıda menyu açılanda bağlama düyməsi görünmürdü)
+    document.documentElement.classList.toggle('menu-open', open);
     if (open) menu.querySelector('a')?.focus();
   };
 

@@ -24,13 +24,12 @@
     "aria": "Intro",
     "pill": "Podcast and video studio · Baku",
     "h1_lead": "Welcome to",
-    "h1_mark": "Y Pod studio!",
+    "h1_mark": "Y\u00a0Pod studio!",
     "sub": "You talk. Filming, editing and delivery are on us.",
     "cta": "Book a shoot",
     "prices": "Pricing"
   },
   "services": {
-    "eyebrow": "Services",
     "title": "You talk, we handle the rest",
     "s1_eb": "01 · Podcast filming",
     "s1_h": "1-camera shoot",
@@ -43,7 +42,7 @@
     "s2_chip": "1 hour ·",
     "s2_num": "120",
     "s3_eb": "03 · Podcast filming",
-    "s3_h": "3-person setup",
+    "s3_h": "3-camera shoot",
     "s3_sub": "Three cameras for guest conversations and panels.",
     "s3_chip": "3 cameras · 1 hour ·",
     "s3_num": "170",
@@ -66,7 +65,7 @@
     "steps_aria": "Service steps",
     "step_1": "1 camera",
     "step_2": "2 cameras",
-    "step_3": "3 people",
+    "step_3": "3 cameras",
     "step_4": "Reels",
     "step_5": "Mobile",
     "step_6": "Editing",
@@ -79,7 +78,7 @@
   "message": {
     "a": "Editing",
     "b": "on time",
-    "text": "Late editing is the most common complaint in the market. With us, the delivery date is known before the shoot and it does not move."
+    "text": "Late editing is the most common complaint in the market. With us, the delivery date is known before the shoot and it does not move. Podcasts are delivered within 7 working days, Reels shoots within 3 working days."
   },
   "brands": {
     "title": "Brands that trust us"

@@ -31,7 +31,9 @@
       var d = document.documentElement;
       d.classList.add('js');
       var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var weak = (navigator.hardwareConcurrency || 8) <= 4 && matchMedia('(pointer: coarse)').matches;
+      // iPhone/iPad Safari nüvə sayını gizlədir (2 və ya 4 qaytarır): onlar zəif sayılmır, Apple GPU-su 3D-ni rahat çəkir
+      var ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      var weak = !ios && (navigator.hardwareConcurrency || 8) <= 4 && matchMedia('(pointer: coarse)').matches;
       var gl = false;
       try {
         var c = document.createElement('canvas');
@@ -167,7 +169,6 @@
       <div class="svc-shade svc-shade--steps" aria-hidden="true"></div>
       <div class="svc-copy">
         <div class="svc-intro">
-          <p class="eb">{{services.eyebrow}}</p>
           <h2 class="hd svc-h2" id="svc-title">{{services.title}}</h2>
         </div>
           <article class="svc-scene" data-scene="1">
@@ -286,22 +287,24 @@
         <p class="mut sec-sub">{{prices.sub}}</p>
       </header>
 
-      <div class="seg-row rv">
-        <span class="seg-label" id="place-a">{{place.label}}</span>
-        <div class="seg seg-place" role="group" aria-labelledby="place-a">
-          <span class="seg-thumb" aria-hidden="true"></span>
-          <button class="sg on" type="button" data-place="studio" aria-pressed="true">{{place.studio}}</button>
-          <button class="sg" type="button" data-place="onsite" aria-pressed="false">{{place.onsite}}</button>
+      <div class="seg-rows">
+        <div class="seg-row rv">
+          <span class="seg-label" id="place-a">{{place.label}}</span>
+          <div class="seg seg-place" role="group" aria-labelledby="place-a">
+            <span class="seg-thumb" aria-hidden="true"></span>
+            <button class="sg on" type="button" data-place="studio" aria-pressed="true">{{place.studio}}</button>
+            <button class="sg" type="button" data-place="onsite" aria-pressed="false">{{place.onsite}}</button>
+          </div>
         </div>
-      </div>
 
-      <div class="seg-row rv">
-        <span class="seg-label" id="cams-a">{{cams.label}}</span>
-        <div class="seg seg-cams" role="group" aria-labelledby="cams-a">
-          <span class="seg-thumb" aria-hidden="true"></span>
-          <button class="sg on" type="button" data-cam="0" aria-pressed="true">{{cams.c0}}</button>
-          <button class="sg" type="button" data-cam="1" aria-pressed="false">{{cams.c1}}</button>
-          <button class="sg" type="button" data-cam="2" aria-pressed="false">{{cams.c2}}</button>
+        <div class="seg-row rv">
+          <span class="seg-label" id="cams-a">{{cams.label}}</span>
+          <div class="seg seg-cams" role="group" aria-labelledby="cams-a">
+            <span class="seg-thumb" aria-hidden="true"></span>
+            <button class="sg on" type="button" data-cam="0" aria-pressed="true">{{cams.c0}}</button>
+            <button class="sg" type="button" data-cam="1" aria-pressed="false">{{cams.c1}}</button>
+            <button class="sg" type="button" data-cam="2" aria-pressed="false">{{cams.c2}}</button>
+          </div>
         </div>
       </div>
 
@@ -521,9 +524,6 @@
   <div class="wrap foot-in">
     <span class="logo logo-foot">Y POD</span>
     <span class="mut foot-copy">{{footer.copy}}</span>
-    <div class="foot-links">
-      <a class="nl" href="https://www.instagram.com/ypod.az/" target="_blank" rel="noopener">Instagram</a>
-    </div>
   </div>
 </footer>
 

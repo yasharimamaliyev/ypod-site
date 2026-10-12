@@ -83,6 +83,53 @@ function marquee(gsap, ScrollTrigger) {
       settle = setTimeout(() => gsap.to(tween, { timeScale: 1, duration: 0.6, overwrite: true }), 120);
     },
   });
+
+  // Əl ilə sürüşdürmə: siçanla dartmaq, barmaqla sağa-sola. Şaquli barmaq hərəkəti səhifənin scroll-udur (touch-action: pan-y).
+  // Buraxanda zolaq sürətlə bir az da gedir, sonra öz axınına qayıdır.
+  const box = track.parentElement;
+  const wrap = gsap.utils.wrap(0, 1);
+  const loopW = () => track.scrollWidth / 2; // zolaq iki dəfə təkrarlanır: xPercent -50 = bir dövr
+  const fling = { d: 0 };
+  let drag = null;
+  const seek = dx => tween.progress(wrap(drag.p0 - dx / loopW()));
+  box.addEventListener('pointerdown', e => {
+    if (e.button) return;
+    if (gsap.isTweening(fling)) { gsap.killTweensOf(fling); tween.resume(); }
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, p0: tween.progress(), on: false, vx: 0, lx: e.clientX, lt: e.timeStamp };
+  });
+  box.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.on) {
+      if (Math.abs(dx) < 6) return;
+      if (Math.abs(e.clientY - drag.y) > Math.abs(dx)) { drag = null; return; }
+      drag.on = true;
+      box.setPointerCapture(e.pointerId);
+      box.classList.add('is-drag');
+      tween.pause();
+    }
+    const dt = e.timeStamp - drag.lt;
+    if (dt > 0) drag.vx = 0.7 * ((e.clientX - drag.lx) / dt) + 0.3 * drag.vx;
+    drag.lx = e.clientX; drag.lt = e.timeStamp;
+    seek(dx);
+  });
+  const release = e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const d = drag;
+    drag = null;
+    if (!d.on) return;
+    box.classList.remove('is-drag');
+    const base = d.lx - d.x, v = e.timeStamp - d.lt > 80 ? 0 : d.vx; // px/ms
+    fling.d = 0;
+    gsap.to(fling, {
+      d: v * 320, duration: 0.9, ease: 'power3.out',
+      onUpdate: () => tween.progress(wrap(d.p0 - (base + fling.d) / loopW())),
+      onComplete: () => tween.resume(),
+    });
+  };
+  box.addEventListener('pointerup', release);
+  box.addEventListener('pointercancel', release);
+  box.addEventListener('dragstart', e => e.preventDefault());
 }
 
 /* ---------- Xidmətlər: statik versiya (reduced-motion, zəif telefon) kart şəkillərini yaxınlaşanda çəkir ---------- */

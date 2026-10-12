@@ -32,10 +32,10 @@ export const HOLDS = [
   [0.613, 0.5],  // S4 Reels, 5/5
   [0.8, 0.4],    // S5b həkim kabineti (v3-ün əsas kadrı)
   [0.963, 0.4],  // S6 "Hazırdır"
-  [1, 0.4],      // Final: pin buraxılmazdan əvvəl
+  [1, 0.15],     // Final: pin buraxılmazdan əvvəl (qısa: ondan sonra adi scroll, brendlər dərhal gəlsin)
 ];
-// Reels kartlarının düzülməsi 1.5×, avadanlığın çamadanlara yığılıb furqona girməsi 1.25× yavaş
-export const STRETCH = [[0.577, 0.613, 1.5], [0.635, 0.711, 1.25]];
+// Reels kartlarının düzülməsi 1.5×, avadanlığın çamadanlara yığılıb furqona girməsi 1.25×, furqonun yolu 1.6× yavaş
+export const STRETCH = [[0.577, 0.613, 1.5], [0.635, 0.711, 1.25], [0.72, 0.765, 1.6]];
 
 // Ekran vahidində (u) düyün nöqtələri: [u, p]. Dayanmada p dəyişmir.
 export function buildScale(base) {
