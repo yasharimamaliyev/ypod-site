@@ -3,6 +3,7 @@
 // Pin CSS ilə edilir: bölmənin hündürlüyü ilk boyamadan bilinir, səhifə sıçramır. Aktiv olanda fixed (is-active),
 // sonra bölmənin dibində (is-past). Sticky iOS/Safari-də scroll zamanı əsirdi.
 import stageSvg from '../assets/services-stage.svg?raw';
+import { CONFIG } from './config.js';
 import { computeStage, buildScale, BASE_SCREENS, HOLDS, STEP_KEYS, STATIC_KEYS } from './services-stage.js';
 
 const DESKTOP = 1024;
@@ -342,91 +343,96 @@ export function initServices(root, { gsap, ScrollTrigger, hero }) {
   }
   const locked = () => html.classList.contains('menu-open'); // mobil menyu açıqdır (nav.js)
 
-  // Təkər/trackpad: bir jest — bir addım. Yeni jest: 250 ms sükut, istiqamət dəyişməsi, ya da sönən ətalətdən sonra
-  // birdən sürətlənmə (trackpad-ın ətalət dalğası sönən rəqəmlərdir, yeni sürüşdürmə isə birdən böyüyür).
-  // Chrome jestin ilk hadisəsi bloklanmayıbsa (məs. zonadan kənarda başlayan jest), qalanlarını bloklamağa icazə vermir:
-  // onda səhifə dayanacaqda əl ilə saxlanılır (pinRest).
-  const g = { t: -1e9, dir: 0, peak: 0, low: 0, used: false, outside: false };
-  let touchInput = false;
-  const pinRest = () => { if (Math.abs(window.scrollY - restY) > 1) { html.style.scrollBehavior = 'auto'; window.scrollTo(0, restY); html.style.scrollBehavior = ''; } };
-  window.addEventListener('wheel', e => {
-    touchInput = false;
-    if (e.ctrlKey || locked()) return;
-    const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? window.innerHeight : 1);
-    if (!dy || Math.abs(e.deltaX) > Math.abs(dy)) return;
-    const dir = Math.sign(dy), abs = Math.abs(dy);
-    const fresh = e.timeStamp - g.t > 250 || dir !== g.dir || (abs > 20 && g.low < g.peak * 0.35 && abs > g.low * 3);
-    if (fresh || abs > g.peak) g.peak = g.low = abs;
-    else g.low = Math.min(g.low, abs);
-    if (fresh) g.used = g.outside = false;
-    g.t = e.timeStamp; g.dir = dir;
-    if (busy) { e.preventDefault(); if (fresh) queued = dir; g.used = true; return; }
-    if (g.used) { e.preventDefault(); if (!e.cancelable) pinRest(); return; }
-    const y = window.scrollY;
-    if (!owns(y, dir)) { g.outside = true; return; }
-    e.preventDefault();
-    // kənardan gələn jest dayanmanın içinə düşdü (məs. aşağıdan final kadrına): ilk dayanacaq elə budur
-    if (g.outside && within(stopsY(), y)) { restY = y; g.used = true; return; }
-    g.used = step(dir);
-  }, { passive: false });
+  // Addım-addım rejimi (CONFIG.stepScroll): jestləri tutub hər birini bir addıma çevirir.
+  // Söndürüləndə (hazırkı qərar, 2026-10-13) film adi scroll-a bağlıdır: əl ilə sürüşdürülür, dayanmalar qalır.
+  if (CONFIG.stepScroll) initStepScroll();
+  function initStepScroll() {
+    // Təkər/trackpad: bir jest — bir addım. Yeni jest: 250 ms sükut, istiqamət dəyişməsi, ya da sönən ətalətdən sonra
+    // birdən sürətlənmə (trackpad-ın ətalət dalğası sönən rəqəmlərdir, yeni sürüşdürmə isə birdən böyüyür).
+    // Chrome jestin ilk hadisəsi bloklanmayıbsa (məs. zonadan kənarda başlayan jest), qalanlarını bloklamağa icazə vermir:
+    // onda səhifə dayanacaqda əl ilə saxlanılır (pinRest).
+    const g = { t: -1e9, dir: 0, peak: 0, low: 0, used: false, outside: false };
+    let touchInput = false;
+    const pinRest = () => { if (Math.abs(window.scrollY - restY) > 1) { html.style.scrollBehavior = 'auto'; window.scrollTo(0, restY); html.style.scrollBehavior = ''; } };
+    window.addEventListener('wheel', e => {
+      touchInput = false;
+      if (e.ctrlKey || locked()) return;
+      const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? window.innerHeight : 1);
+      if (!dy || Math.abs(e.deltaX) > Math.abs(dy)) return;
+      const dir = Math.sign(dy), abs = Math.abs(dy);
+      const fresh = e.timeStamp - g.t > 250 || dir !== g.dir || (abs > 20 && g.low < g.peak * 0.35 && abs > g.low * 3);
+      if (fresh || abs > g.peak) g.peak = g.low = abs;
+      else g.low = Math.min(g.low, abs);
+      if (fresh) g.used = g.outside = false;
+      g.t = e.timeStamp; g.dir = dir;
+      if (busy) { e.preventDefault(); if (fresh) queued = dir; g.used = true; return; }
+      if (g.used) { e.preventDefault(); if (!e.cancelable) pinRest(); return; }
+      const y = window.scrollY;
+      if (!owns(y, dir)) { g.outside = true; return; }
+      e.preventDefault();
+      // kənardan gələn jest dayanmanın içinə düşdü (məs. aşağıdan final kadrına): ilk dayanacaq elə budur
+      if (g.outside && within(stopsY(), y)) { restY = y; g.used = true; return; }
+      g.used = step(dir);
+    }, { passive: false });
 
-  const KEYS = { ArrowDown: 1, PageDown: 1, ' ': 1, ArrowUp: -1, PageUp: -1 };
-  window.addEventListener('keydown', e => {
-    let dir = KEYS[e.key];
-    if (!dir || e.altKey || e.ctrlKey || e.metaKey || locked()) return;
-    if (e.key === ' ' && e.shiftKey) dir = -1;
-    if (e.target.closest?.('input, textarea, select, [contenteditable]') || (e.key === ' ' && e.target.closest?.('a, button, summary'))) return;
-    if (busy) { e.preventDefault(); if (!e.repeat) queued = dir; return; }
-    if (!owns(window.scrollY, dir)) return;
-    e.preventDefault();
-    step(dir);
-  });
+    const KEYS = { ArrowDown: 1, PageDown: 1, ' ': 1, ArrowUp: -1, PageUp: -1 };
+    window.addEventListener('keydown', e => {
+      let dir = KEYS[e.key];
+      if (!dir || e.altKey || e.ctrlKey || e.metaKey || locked()) return;
+      if (e.key === ' ' && e.shiftKey) dir = -1;
+      if (e.target.closest?.('input, textarea, select, [contenteditable]') || (e.key === ' ' && e.target.closest?.('a, button, summary'))) return;
+      if (busy) { e.preventDefault(); if (!e.repeat) queued = dir; return; }
+      if (!owns(window.scrollY, dir)) return;
+      e.preventDefault();
+      step(dir);
+    });
 
-  // Toxunma: barmaq zonada sürüşdürəndə səhifə tərpənmir, 24 px-dən sonra bir addım atılır
-  const tch = { y: 0, mode: 0, used: false, on: false };
-  window.addEventListener('touchstart', e => {
-    touchInput = true; tch.on = true; tch.used = false;
-    tch.mode = e.touches.length > 1 || locked() ? -1 : 0;
-    tch.y = e.touches[0].clientY;
-  }, { passive: true });
-  window.addEventListener('touchmove', e => {
-    if (tch.mode < 0 || e.touches.length > 1) return;
-    const dy = tch.y - e.touches[0].clientY;
-    if (!tch.mode) {
-      if (!dy) return;
-      tch.mode = busy || owns(window.scrollY, Math.sign(dy)) ? 1 : -1;
-      if (tch.mode < 0) return;
-    }
-    if (e.cancelable) e.preventDefault();
-    if (!tch.used && Math.abs(dy) > 24) {
-      tch.used = true;
-      if (busy) queued = Math.sign(dy); else step(Math.sign(dy));
-    }
-  }, { passive: false });
-  const touchEnd = e => { if (!e.touches.length) tch.on = false; };
-  window.addEventListener('touchend', touchEnd, { passive: true });
-  window.addEventListener('touchcancel', touchEnd, { passive: true });
+    // Toxunma: barmaq zonada sürüşdürəndə səhifə tərpənmir, 24 px-dən sonra bir addım atılır
+    const tch = { y: 0, mode: 0, used: false, on: false };
+    window.addEventListener('touchstart', e => {
+      touchInput = true; tch.on = true; tch.used = false;
+      tch.mode = e.touches.length > 1 || locked() ? -1 : 0;
+      tch.y = e.touches[0].clientY;
+    }, { passive: true });
+    window.addEventListener('touchmove', e => {
+      if (tch.mode < 0 || e.touches.length > 1) return;
+      const dy = tch.y - e.touches[0].clientY;
+      if (!tch.mode) {
+        if (!dy) return;
+        tch.mode = busy || owns(window.scrollY, Math.sign(dy)) ? 1 : -1;
+        if (tch.mode < 0) return;
+      }
+      if (e.cancelable) e.preventDefault();
+      if (!tch.used && Math.abs(dy) > 24) {
+        tch.used = true;
+        if (busy) queued = Math.sign(dy); else step(Math.sign(dy));
+      }
+    }, { passive: false });
+    const touchEnd = e => { if (!e.touches.length) tch.on = false; };
+    window.addEventListener('touchend', touchEnd, { passive: true });
+    window.addEventListener('touchcancel', touchEnd, { passive: true });
 
-  // Zonada barmaq ekranda deyil, animasiya da getmir, amma səhifə sürüşür: bu, zonadan kənarda başlamış jestin ətalətidir.
-  // Ətalət kəsilir və hərəkət istiqamətindəki dayanacağa gedilir. Nav linkləri (#anchor) də zonadan keçir: onlara toxunulmur.
-  let lastY = window.scrollY, navJump = false, navTimer = 0;
-  document.addEventListener('click', e => { if (e.target.closest?.('a[href^="#"]')) navJump = true; }, true);
-  window.addEventListener('scroll', () => {
-    const y = window.scrollY, py = lastY;
-    lastY = y;
-    // təkər jesti dayanacağa çatıb, amma bloklanmayan ətalət səhifəni hələ sürüşdürür
-    if (!busy && g.used && !touchInput && performance.now() - g.t < 250) { pinRest(); return; }
-    if (navJump) { clearTimeout(navTimer); navTimer = setTimeout(() => { navJump = false; }, 200); return; }
-    if (!touchInput || busy || tch.on || locked() || Math.abs(y - py) < 1) return;
-    const dir = Math.sign(y - py);
-    if (!owns(y, dir)) return;
-    const S = stopsY();
-    let to;
-    if (within(S, y)) to = y; // dayanmanın içindədir: elə burada dayanır
-    else to = dir > 0 ? inside(S.find(([a]) => a > y), 1) : inside(S.findLast(([, b]) => b < y), -1);
-    html.style.overflow = 'hidden'; // iOS ətaləti yalnız belə dayanır; glide bitəndə qaytarılır
-    glide(to);
-  }, { passive: true });
+    // Zonada barmaq ekranda deyil, animasiya da getmir, amma səhifə sürüşür: bu, zonadan kənarda başlamış jestin ətalətidir.
+    // Ətalət kəsilir və hərəkət istiqamətindəki dayanacağa gedilir. Nav linkləri (#anchor) də zonadan keçir: onlara toxunulmur.
+    let lastY = window.scrollY, navJump = false, navTimer = 0;
+    document.addEventListener('click', e => { if (e.target.closest?.('a[href^="#"]')) navJump = true; }, true);
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY, py = lastY;
+      lastY = y;
+      // təkər jesti dayanacağa çatıb, amma bloklanmayan ətalət səhifəni hələ sürüşdürür
+      if (!busy && g.used && !touchInput && performance.now() - g.t < 250) { pinRest(); return; }
+      if (navJump) { clearTimeout(navTimer); navTimer = setTimeout(() => { navJump = false; }, 200); return; }
+      if (!touchInput || busy || tch.on || locked() || Math.abs(y - py) < 1) return;
+      const dir = Math.sign(y - py);
+      if (!owns(y, dir)) return;
+      const S = stopsY();
+      let to;
+      if (within(S, y)) to = y; // dayanmanın içindədir: elə burada dayanır
+      else to = dir > 0 ? inside(S.find(([a]) => a > y), 1) : inside(S.findLast(([, b]) => b < y), -1);
+      html.style.overflow = 'hidden'; // iOS ətaləti yalnız belə dayanır; glide bitəndə qaytarılır
+      glide(to);
+    }, { passive: true });
+  }
 
   // Addım göstəricisi: səhnənin əsas kadrına (dayanmanın başına)
   el.steps.forEach(({ b }, i) => b.addEventListener('click', () => {

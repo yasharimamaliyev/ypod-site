@@ -20,4 +20,7 @@ export const CONFIG = {
 
   // Hazır GLB modeli gələndə: 'models/mic.glb' (public/models/ qovluğuna qoy). null → kodla qurulan model
   micModelUrl: null,
+
+  // Xidmətlər filmi: true → bir scroll jesti = bir addım (animasiya özü oynayır); false → əl ilə sürüşdürmə (2026-10-13)
+  stepScroll: false,
 };
