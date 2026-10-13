@@ -25,13 +25,14 @@ export const STEP_KEYS = [0.175, 0.31, 0.455, 0.613, 0.8, 0.963];
    kadr yerində qalır, scroll davam edir. Ölçülər ekran hündürlüyünün payıdır (0.4 = 40vh). */
 export const BASE_SCREENS = { desktop: 7, mobile: 6 };      // dizayndakı pin uzunluğu (700vh / 600vh)
 export const HOLDS = [
-  [0.04, 0.4],   // S0 "Siz danışın, qalanını biz edək"
-  [0.175, 0.4],  // S1
-  [0.31, 0.4],   // S2
-  [0.455, 0.4],  // S3
-  [0.613, 0.5],  // S4 Reels, 5/5
-  [0.8, 0.4],    // S5b həkim kabineti (v3-ün əsas kadrı)
-  [0.963, 0.4],  // S6 "Hazırdır"
+  // Əl ilə sürüşdürmədə dayanmalar yarıya endirilib (2026-10-13): növbəti səhnəyə az scroll ilə keçilir
+  [0.04, 0.2],   // S0 "Siz danışın, qalanını biz edək"
+  [0.175, 0.2],  // S1
+  [0.31, 0.2],   // S2
+  [0.455, 0.2],  // S3
+  [0.613, 0.25], // S4 Reels, 5/5
+  [0.8, 0.2],    // S5b həkim kabineti (v3-ün əsas kadrı)
+  [0.963, 0.2],  // S6 "Hazırdır"
   [1, 0.15],     // Final: pin buraxılmazdan əvvəl (qısa: ondan sonra adi scroll, brendlər dərhal gəlsin)
 ];
 // Reels kartlarının düzülməsi 1.5×, avadanlığın çamadanlara yığılıb furqona girməsi 1.25×, furqonun yolu 1.6× yavaş

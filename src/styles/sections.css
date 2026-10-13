@@ -95,7 +95,8 @@ html.menu-open { overflow: hidden; }
 @media (min-width: 1280px) { .hero-h1 { font-size: 72px; } }
 
 /* ---- 3D rejimi: hero ilk boyamadan sticky ölçüdədir ki, 3D gələndə səhifə sıçramasın ---- */
-.can-3d .hero { height: 200vh; }
+/* Mikrofonun animasiyası: mobil 0.6, desktop 0.9 ekran scroll (əvvəl 1 və 1.5, 2026-10-13) */
+.can-3d .hero { height: 160vh; }
 .can-3d .hero-pin {
   position: sticky; top: var(--nav-h);
   height: calc(100vh - var(--nav-h)); height: calc(100svh - var(--nav-h));
@@ -123,7 +124,7 @@ html.menu-open { overflow: hidden; }
   .can-3d .hero-ctas .btn { flex: 1; width: auto; padding: 0 12px; }
 }
 @media (min-width: 1024px) {
-  .can-3d .hero { height: 250vh; }
+  .can-3d .hero { height: 190vh; }
   .can-3d .hero-grid { justify-content: center; padding-bottom: 0; }
   .can-3d .hero-mic { height: calc(100svh - var(--nav-h)); }
 }
@@ -210,13 +211,13 @@ html.menu-open { overflow: hidden; }
 /* ---- Xidmətlər: scroll filmi ---- */
 /* Hündürlük = ekran + scroll məsafəsi. Məsafə services-stage.js-dəki buildScale().total-dır (dizayn 600/700vh + dayanmalar);
    rəqəm dəyişəndə burada da dəyiş (tests/services.test.mjs yoxlayır). */
-.svc-anim .svc { height: 1043.4vh; height: 1043.4svh; padding: 0; overflow-x: clip; }
+.svc-anim .svc { height: 898.4vh; height: 898.4svh; padding: 0; overflow-x: clip; }
 /* Nav linki S0-ın dayanmasının başına (p 4% = 0.24 ekran) aparır */
 .svc-anim .svc { scroll-margin-top: calc(-1 * var(--nav-h) - 24vh); scroll-margin-top: calc(-1 * var(--nav-h) - 24svh); }
 /* 3D hero: bölmə hero-nun son ekranının üstündən başlayır (BRIEF bölmə 10). Keçidin ilk 3%-ində (--hero-tail)
    hero pin-i yerində qalır və qaranlığa batır, yuxarı sürüşmür. */
 .svc-anim.can-3d { --hero-tail: 18vh; --hero-tail: 18svh; }
-.svc-anim.can-3d .hero { height: calc(200vh + var(--hero-tail)); }
+.svc-anim.can-3d .hero { height: calc(160vh + var(--hero-tail)); }
 .svc-anim.can-3d .svc { margin-top: calc(-100vh - var(--hero-tail)); margin-top: calc(-100svh - var(--hero-tail)); }
 .hero-tail { position: absolute; width: 0; height: var(--hero-tail, 0); visibility: hidden; pointer-events: none; }
 .svc-anim .svc-pin {
@@ -287,9 +288,9 @@ html.menu-open { overflow: hidden; }
 .svc-anim .svc.is-active .svc-txt, .svc-anim .svc.is-active .svc-chip { will-change: transform, opacity; }
 
 @media (min-width: 1024px) {
-  .svc-anim .svc { height: 1149.8vh; height: 1149.8svh; scroll-margin-top: calc(-1 * var(--nav-h) - 28vh); scroll-margin-top: calc(-1 * var(--nav-h) - 28svh); }
+  .svc-anim .svc { height: 1004.8vh; height: 1004.8svh; scroll-margin-top: calc(-1 * var(--nav-h) - 28vh); scroll-margin-top: calc(-1 * var(--nav-h) - 28svh); }
   .svc-anim.can-3d { --hero-tail: 21vh; --hero-tail: 21svh; }
-  .svc-anim.can-3d .hero { height: calc(250vh + var(--hero-tail)); }
+  .svc-anim.can-3d .hero { height: calc(190vh + var(--hero-tail)); }
   .svc-anim .svc-shade { display: block; position: absolute; top: var(--nav-h); bottom: 0; opacity: 0; }
   .svc-shade--copy { left: 0; width: 640px; background: linear-gradient(90deg, rgba(11, 7, 19, .9) 0%, rgba(11, 7, 19, .82) 60%, rgba(11, 7, 19, 0) 100%); }
   .svc-shade--steps { right: 0; width: 230px; background: linear-gradient(270deg, rgba(11, 7, 19, .95) 0%, rgba(11, 7, 19, .9) 62%, rgba(11, 7, 19, 0) 100%); }

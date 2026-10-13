@@ -40,5 +40,5 @@ test('S0 dayanması CSS-dəki nav linki (scroll-margin) ilə üst-üstə düşü
 test('addım düymələri dayanmaların başına aparır', () => {
   const s = buildScale(BASE_SCREENS.desktop);
   for (const k of STEP_KEYS) assert.ok(HOLDS.some(([p]) => p === k), `${k} üçün dayanma yoxdur`);
-  close(s.pAt(s.uAt(0.613) + 0.25), 0.613, 'Reels dayanmasının ortası');
+  close(s.pAt(s.uAt(0.613) + 0.12), 0.613, 'Reels dayanmasının ortası');
 });
